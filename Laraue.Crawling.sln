@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laraue.Crawling.Static", "src\Laraue.Crawling.Static\Laraue.Crawling.Static.csproj", "{55CCD2DA-9119-4D65-B8FE-A8E20AC97D4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laraue.Crawling.Static.AngleSharp", "Laraue.Crawling.Static.AngleSharp\Laraue.Crawling.Static.AngleSharp.csproj", "{D2577EC5-80DD-457F-8259-E06843955CD8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2B00BEFA-AE75-4778-8C86-3FBD6BFD7584}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E1D18DB5-799D-4B9B-8A23-FC8347169E03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laraue.Crawling.Static.Tests", "tests\Laraue.Crawling.Static.Tests\Laraue.Crawling.Static.Tests.csproj", "{3542E624-AD57-4B29-8292-E8A82754B495}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D2577EC5-80DD-457F-8259-E06843955CD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2577EC5-80DD-457F-8259-E06843955CD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2577EC5-80DD-457F-8259-E06843955CD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2577EC5-80DD-457F-8259-E06843955CD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55CCD2DA-9119-4D65-B8FE-A8E20AC97D4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55CCD2DA-9119-4D65-B8FE-A8E20AC97D4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3542E624-AD57-4B29-8292-E8A82754B495}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3542E624-AD57-4B29-8292-E8A82754B495}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3542E624-AD57-4B29-8292-E8A82754B495}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3542E624-AD57-4B29-8292-E8A82754B495}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{55CCD2DA-9119-4D65-B8FE-A8E20AC97D4F} = {2B00BEFA-AE75-4778-8C86-3FBD6BFD7584}
+		{D2577EC5-80DD-457F-8259-E06843955CD8} = {2B00BEFA-AE75-4778-8C86-3FBD6BFD7584}
+		{3542E624-AD57-4B29-8292-E8A82754B495} = {E1D18DB5-799D-4B9B-8A23-FC8347169E03}
+	EndGlobalSection
+EndGlobal
