@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laraue.Crawling.Static", "src\Laraue.Crawling.Static\Laraue.Crawling.Static.csproj", "{55CCD2DA-9119-4D65-B8FE-A8E20AC97D4F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laraue.Crawling.Static.AngleSharp", "Laraue.Crawling.Static.AngleSharp\Laraue.Crawling.Static.AngleSharp.csproj", "{D2577EC5-80DD-457F-8259-E06843955CD8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laraue.Crawling.Static.AngleSharp", "src\Laraue.Crawling.Static.AngleSharp\Laraue.Crawling.Static.AngleSharp.csproj", "{D2577EC5-80DD-457F-8259-E06843955CD8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2B00BEFA-AE75-4778-8C86-3FBD6BFD7584}"
 EndProject

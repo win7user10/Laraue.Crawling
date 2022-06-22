@@ -3,6 +3,9 @@ using Laraue.Crawling.Static.Abstractions;
 
 namespace Laraue.Crawling.Static.AngleSharp;
 
+/// <summary>
+/// AngleSharp wrapper for <see cref="IHtmlElement"/>.
+/// </summary>
 public class AngleSharpHtmlElement : IHtmlElement
 {
     private readonly IElement _element;

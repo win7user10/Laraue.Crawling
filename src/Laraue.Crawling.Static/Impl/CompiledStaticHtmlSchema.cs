@@ -2,9 +2,9 @@
 
 namespace Laraue.Crawling.Static.Impl;
 
-internal class CompiledHtmlSchema<TModel> : ICompiledHtmlSchema<TModel>
+internal class CompiledStaticHtmlSchema<TModel> : ICompiledStaticHtmlSchema<TModel>
 {
-    public CompiledHtmlSchema(ComplexTypeBindingExpression bindingExpression)
+    public CompiledStaticHtmlSchema(ComplexTypeBindingExpression bindingExpression)
     {
         BindingExpression = bindingExpression;
     }

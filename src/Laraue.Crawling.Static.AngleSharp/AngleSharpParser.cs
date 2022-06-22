@@ -5,7 +5,7 @@ using Laraue.Crawling.Static.Abstractions;
 
 namespace Laraue.Crawling.Static.AngleSharp;
 
-public class AngleSharpParser
+public class AngleSharpParser : IStaticHtmlSchemaParser
 {
     private readonly IHtmlParser _htmlParser;
 
@@ -14,32 +14,32 @@ public class AngleSharpParser
         _htmlParser = htmlParser;
     }
     
-    public TModel VisitSchema<TModel>(ICompiledHtmlSchema<TModel> schema, string html)
+    public TModel Parse<TModel>(ICompiledStaticHtmlSchema<TModel> schema, string html)
     {
-        var instance = Visit(schema.BindingExpression, _htmlParser.ParseDocument(html).Body);
+        var instance = Parse(schema.BindingExpression, _htmlParser.ParseDocument(html).Body);
 
         return (TModel) instance;
     }
 
-    private object Visit(BindingExpression bindingExpression, IElement? document)
+    private object Parse(BindingExpression bindingExpression, IElement? document)
     {
         switch (bindingExpression)
         {
             case ComplexTypeBindingExpression complexType:
-                return Visit(complexType, document);
+                return Parse(complexType, document);
                 break;
             case ArrayBindingExpression arrayType:
-                return Visit(arrayType, document);
+                return Parse(arrayType, document);
                 break;
             case SimpleTypeBindingExpression simpleType:
-                return Visit(simpleType, document);
+                return Parse(simpleType, document);
                 break;
             default:
                 throw new NotImplementedException();
         }
     }
 
-    private object Visit(ComplexTypeBindingExpression complexType, IElement? document)
+    private object Parse(ComplexTypeBindingExpression complexType, IElement? document)
     {
         var intermediateNode = complexType.HtmlSelector is not null
             ? document?.QuerySelector(complexType.HtmlSelector.Selector)
@@ -54,14 +54,14 @@ public class AngleSharpParser
 
         foreach (var element in complexType.Elements)
         {
-            var value = Visit(element, intermediateNode);
+            var value = Parse(element, intermediateNode);
             element.PropertySetter(objectInstance, value);
         }
 
         return objectInstance;
     }
     
-    private static object? Visit(SimpleTypeBindingExpression simpleType, IElement? document)
+    private static object? Parse(SimpleTypeBindingExpression simpleType, IElement? document)
     {
         if (simpleType.HtmlSelector is not null)
         {
@@ -76,7 +76,7 @@ public class AngleSharpParser
         return null;
     }
     
-    private object Visit(ArrayBindingExpression arrayType, IElement? document)
+    private object Parse(ArrayBindingExpression arrayType, IElement? document)
     {
         IHtmlCollection<IElement>? children = null;
         if (arrayType.HtmlSelector is not null)
@@ -94,7 +94,7 @@ public class AngleSharpParser
         for (var i = 0; i < children.Length; i++)
         {
             var child = children[i];
-            var value = Visit(arrayType.Element, child);
+            var value = Parse(arrayType.Element, child);
             result[i] = value;
         }
         

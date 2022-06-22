@@ -12,7 +12,7 @@ public class AngleSharpParserTests
     [Fact]
     public void Scheme_ShouldBeParsedCorrectly()
     {
-        var schema = new HtmlSchemaBuilder<OnePage>()
+        var schema = new StaticHtmlSchemaBuilder<OnePage>()
             .HasProperty(x => x.Title, ".title")
             .HasProperty(x => x.User, ".user", userBuilder =>
             {
@@ -31,7 +31,7 @@ public class AngleSharpParserTests
         var visitor = new AngleSharpParser(htmlParser);
 
         var html = File.ReadAllText("test.html");
-        var model = visitor.VisitSchema(schema, html);
+        var model = visitor.Parse(schema, html);
         
         Assert.Equal("Private info", model.Title);
         Assert.Equal("Alex", model.User.Name);

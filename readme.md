@@ -2,37 +2,41 @@
 
 The set of tools for fast writing crawlers on .NET.
 
-### Build schema
+### Static crawling
+
+Static means the crawling process is performing in the html which is not changes.
+You can build a strongly typed schema where for each property defines it mapping to
+html by using html selectors. Then this schema can be parsed via IStaticHtmlSchemaParser class.
+Use default implementation AngleSharpHtmlParser to retrieve all data.
+
+#### Build static schema
 
 ```cs
-var schema = new HtmlSchemaBuilder<OnePage>()
-    .HasProperty(x => x.Title, ".title")
-    .HasProperty(x => x.User, ".user", userBuilder =>
+record User(string Name, int Age, Dog[] Dogs);
+record Dog(string Name, int Age);
+
+var schema = new HtmlSchemaBuilder<User>()
+    .HasProperty(x => x.Name, ".name")
+    .HasProperty(x => x.Age, ".age", ageElement => int.Parse(ageElement.GetInnerHtml()))
+    .HasArrayProperty(x => x.Dogs, ".dog", dogsBuilder =>
     {
-        userBuilder.HasProperty(x => x.Name, ".name")
-            .HasProperty(x => x.Age, ".age", x => int.Parse(x.GetInnerHtml()))
-            .HasArrayProperty(x => x.Dogs, ".dog", dogsBuilder =>
-            {
-                dogsBuilder.HasProperty(x => x.Age, ".age", x => int.Parse(x.GetInnerHtml()))
-                    .HasProperty(x => x.Name, ".name");
-            });
-    })
-    .HasArrayProperty(x => x.ImageLinks, ".links a", x => x.GetAttribute("href"))
+        dogsBuilder.HasProperty(x => x.Age, ".age", x => int.Parse(x.GetInnerHtml()))
+            .HasProperty(x => x.Name, ".name");
+    });
     .Build();
 ```
 
-#### And use this schema for the passed html
+#### Using of the static schema for parsing of the passed html
 
 ```
 var htmlParser = new HtmlParser();
 var visitor = new AngleSharpParser(htmlParser);
 
 var html = File.ReadAllText("test.html");
-var model = visitor.VisitSchema(schema, html);
+var model = visitor.Parse(schema, html);
 
-Assert.Equal("Private info", model.Title);
-Assert.Equal("Alex", model.User.Name);
-Assert.Equal(10, model.User.Age);
+Assert.Equal("Alex", model.Name);
+Assert.Equal(10, model.Age);
 
 var dogs = model.User.Dogs;
 Assert.Equal(2, dogs.Length);
@@ -44,9 +48,8 @@ Assert.Equal("Jelly", dog1.Name);
 var dog2 = dogs[1];
 Assert.Equal(7, dog2.Age);
 Assert.Equal("Marly", dog2.Name);
-
-var links = model.ImageLinks;
-Assert.Equal(2, links.Length);
-Assert.Equal("https://hey1.html", links[0]);
-Assert.Equal("https://hey2.html", links[1]);
 ```
+
+### Dynamic crawling
+
+This section is not ready

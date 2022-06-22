@@ -4,11 +4,11 @@ using Laraue.Crawling.Static.Abstractions;
 
 namespace Laraue.Crawling.Static.Impl;
 
-public class HtmlSchemaBuilder<TModel> : IHtmlSchemaBuilder<TModel>
+public class StaticHtmlSchemaBuilder<TModel> : IStaticHtmlSchemaBuilder<TModel>
 {
     private readonly List<BindingExpression> _bindingExpressions = new ();
 
-    public IHtmlSchemaBuilder<TModel> HasProperty<TValue>(
+    public IStaticHtmlSchemaBuilder<TModel> HasProperty<TValue>(
         Expression<Func<TModel, TValue>> schemaProperty,
         HtmlSelector htmlSelector,
         Func<IHtmlElement?, TValue?> mapFunction)
@@ -26,7 +26,7 @@ public class HtmlSchemaBuilder<TModel> : IHtmlSchemaBuilder<TModel>
         return this;
     }
 
-    public IHtmlSchemaBuilder<TModel> HasProperty<TValue>(Expression<Func<TModel, TValue>> schemaProperty, HtmlSelector htmlSelector, Action<IHtmlSchemaBuilder<TValue>> childBuilder)
+    public IStaticHtmlSchemaBuilder<TModel> HasProperty<TValue>(Expression<Func<TModel, TValue>> schemaProperty, HtmlSelector htmlSelector, Action<IStaticHtmlSchemaBuilder<TValue>> childBuilder)
     {
         var property = GetBindingProperty(schemaProperty);
         var internalSchema = GetInternalSchema(childBuilder, (target, value) 
@@ -43,7 +43,7 @@ public class HtmlSchemaBuilder<TModel> : IHtmlSchemaBuilder<TModel>
         return this;
     }
 
-    public IHtmlSchemaBuilder<TModel> HasArrayProperty<TValue>(Expression<Func<TModel, TValue[]>> schemaProperty, HtmlSelector htmlSelector, Func<IHtmlElement?, TValue?> mapFunction)
+    public IStaticHtmlSchemaBuilder<TModel> HasArrayProperty<TValue>(Expression<Func<TModel, TValue[]>> schemaProperty, HtmlSelector htmlSelector, Func<IHtmlElement?, TValue?> mapFunction)
     {
         var property = GetBindingProperty(schemaProperty);
         
@@ -62,7 +62,7 @@ public class HtmlSchemaBuilder<TModel> : IHtmlSchemaBuilder<TModel>
         return this;
     }
 
-    public IHtmlSchemaBuilder<TModel> HasArrayProperty<TValue>(Expression<Func<TModel, TValue[]>> schemaProperty, HtmlSelector htmlSelector, Action<IHtmlSchemaBuilder<TValue>> childBuilder)
+    public IStaticHtmlSchemaBuilder<TModel> HasArrayProperty<TValue>(Expression<Func<TModel, TValue[]>> schemaProperty, HtmlSelector htmlSelector, Action<IStaticHtmlSchemaBuilder<TValue>> childBuilder)
     {
         var property = GetBindingProperty(schemaProperty);
 
@@ -82,9 +82,9 @@ public class HtmlSchemaBuilder<TModel> : IHtmlSchemaBuilder<TModel>
         return this;
     }
     
-    private ComplexTypeBindingExpression GetInternalSchema<TValue>(Action<IHtmlSchemaBuilder<TValue>> childBuilder, Action<object, object?> propertySetter)
+    private ComplexTypeBindingExpression GetInternalSchema<TValue>(Action<IStaticHtmlSchemaBuilder<TValue>> childBuilder, Action<object, object?> propertySetter)
     {
-        var internalSchemaBuilder = new HtmlSchemaBuilder<TValue>();
+        var internalSchemaBuilder = new StaticHtmlSchemaBuilder<TValue>();
         
         childBuilder(internalSchemaBuilder);
 
@@ -106,9 +106,9 @@ public class HtmlSchemaBuilder<TModel> : IHtmlSchemaBuilder<TModel>
         return property ?? throw new NotImplementedException();
     }
 
-    public ICompiledHtmlSchema<TModel> Build()
+    public ICompiledStaticHtmlSchema<TModel> Build()
     {
-        return new CompiledHtmlSchema<TModel>(
+        return new CompiledStaticHtmlSchema<TModel>(
             new ComplexTypeBindingExpression(
                 null,
                 null,
