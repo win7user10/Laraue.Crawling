@@ -1,4 +1,5 @@
 ﻿using AngleSharp.Dom;
+using Laraue.Crawling.Abstractions;
 using Laraue.Crawling.Static.Abstractions;
 
 namespace Laraue.Crawling.Static.AngleSharp;

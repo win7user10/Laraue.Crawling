@@ -1,4 +1,4 @@
-﻿namespace Laraue.Crawling.Static.Abstractions;
+﻿namespace Laraue.Crawling.Abstractions;
 
 /// <summary>
 /// Represent html selector.

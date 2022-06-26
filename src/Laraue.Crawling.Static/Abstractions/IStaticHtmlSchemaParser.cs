@@ -12,5 +12,5 @@ public interface IStaticHtmlSchemaParser
     /// <param name="html"></param>
     /// <typeparam name="TModel"></typeparam>
     /// <returns></returns>
-    public TModel Parse<TModel>(ICompiledStaticHtmlSchema<TModel> schema, string html);
+    public TModel? Parse<TModel>(ICompiledStaticHtmlSchema<TModel> schema, string html);
 }

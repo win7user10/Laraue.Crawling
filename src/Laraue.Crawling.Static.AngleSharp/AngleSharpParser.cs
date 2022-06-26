@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
+using Laraue.Crawling.Abstractions;
 using Laraue.Crawling.Static.Abstractions;
 
 namespace Laraue.Crawling.Static.AngleSharp;
@@ -14,32 +15,25 @@ public class AngleSharpParser : IStaticHtmlSchemaParser
         _htmlParser = htmlParser;
     }
     
-    public TModel Parse<TModel>(ICompiledStaticHtmlSchema<TModel> schema, string html)
+    public TModel? Parse<TModel>(ICompiledStaticHtmlSchema<TModel> schema, string html)
     {
         var instance = Parse(schema.BindingExpression, _htmlParser.ParseDocument(html).Body);
 
-        return (TModel) instance;
+        return (TModel?) instance;
     }
 
-    private object Parse(BindingExpression bindingExpression, IElement? document)
+    private object? Parse(BindingExpression bindingExpression, IElement? document)
     {
-        switch (bindingExpression)
+        return bindingExpression switch
         {
-            case ComplexTypeBindingExpression complexType:
-                return Parse(complexType, document);
-                break;
-            case ArrayBindingExpression arrayType:
-                return Parse(arrayType, document);
-                break;
-            case SimpleTypeBindingExpression simpleType:
-                return Parse(simpleType, document);
-                break;
-            default:
-                throw new NotImplementedException();
-        }
+            ComplexTypeBindingExpression complexType => Parse(complexType, document),
+            ArrayBindingExpression arrayType => Parse(arrayType, document),
+            SimpleTypeBindingExpression simpleType => Parse(simpleType, document),
+            _ => throw new NotImplementedException()
+        };
     }
 
-    private object Parse(ComplexTypeBindingExpression complexType, IElement? document)
+    private object? Parse(ComplexTypeBindingExpression complexType, IElement? document)
     {
         var intermediateNode = complexType.HtmlSelector is not null
             ? document?.QuerySelector(complexType.HtmlSelector.Selector)
@@ -50,7 +44,7 @@ public class AngleSharpParser : IStaticHtmlSchemaParser
             return null;
         }
 
-        var objectInstance = GetInstanceOfType(complexType.ObjectType);
+        var objectInstance = Helper.GetInstanceOfType(complexType.ObjectType);
 
         foreach (var element in complexType.Elements)
         {
@@ -76,7 +70,7 @@ public class AngleSharpParser : IStaticHtmlSchemaParser
         return null;
     }
     
-    private object Parse(ArrayBindingExpression arrayType, IElement? document)
+    private object? Parse(ArrayBindingExpression arrayType, IElement? document)
     {
         IHtmlCollection<IElement>? children = null;
         if (arrayType.HtmlSelector is not null)
@@ -89,7 +83,7 @@ public class AngleSharpParser : IStaticHtmlSchemaParser
             return null;
         }
 
-        var result = (object[])Array.CreateInstance(arrayType.ObjectType, children.Length);
+        var result = (object?[])Array.CreateInstance(arrayType.ObjectType, children.Length);
 
         for (var i = 0; i < children.Length; i++)
         {
@@ -99,12 +93,5 @@ public class AngleSharpParser : IStaticHtmlSchemaParser
         }
         
         return result;
-    }
-
-    private static object GetInstanceOfType(Type type)
-    {
-        return type.GetConstructor(Type.EmptyTypes) != null 
-            ? Activator.CreateInstance(type)!
-            : RuntimeHelpers.GetUninitializedObject(type);
     }
 }

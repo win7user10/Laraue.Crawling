@@ -28,7 +28,7 @@ var schema = new HtmlSchemaBuilder<User>()
 
 #### Using of the static schema for parsing of the passed html
 
-```
+```cs
 var htmlParser = new HtmlParser();
 var visitor = new AngleSharpParser(htmlParser);
 

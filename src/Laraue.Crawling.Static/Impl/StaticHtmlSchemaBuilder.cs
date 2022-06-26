@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
+using Laraue.Crawling.Abstractions;
 using Laraue.Crawling.Static.Abstractions;
 
 namespace Laraue.Crawling.Static.Impl;
@@ -13,7 +14,7 @@ public class StaticHtmlSchemaBuilder<TModel> : IStaticHtmlSchemaBuilder<TModel>
         HtmlSelector htmlSelector,
         Func<IHtmlElement?, TValue?> mapFunction)
     {
-        var property = GetBindingProperty(schemaProperty);
+        var property = Helper.GetParsingProperty(schemaProperty);
         
         var bindingExpression = new SimpleTypeBindingExpression(
             (target, value) => property.SetValue(target, value, null),
@@ -28,7 +29,7 @@ public class StaticHtmlSchemaBuilder<TModel> : IStaticHtmlSchemaBuilder<TModel>
 
     public IStaticHtmlSchemaBuilder<TModel> HasProperty<TValue>(Expression<Func<TModel, TValue>> schemaProperty, HtmlSelector htmlSelector, Action<IStaticHtmlSchemaBuilder<TValue>> childBuilder)
     {
-        var property = GetBindingProperty(schemaProperty);
+        var property = Helper.GetParsingProperty(schemaProperty);
         var internalSchema = GetInternalSchema(childBuilder, (target, value) 
             => property.SetValue(target, value, null));
         
@@ -45,7 +46,7 @@ public class StaticHtmlSchemaBuilder<TModel> : IStaticHtmlSchemaBuilder<TModel>
 
     public IStaticHtmlSchemaBuilder<TModel> HasArrayProperty<TValue>(Expression<Func<TModel, TValue[]>> schemaProperty, HtmlSelector htmlSelector, Func<IHtmlElement?, TValue?> mapFunction)
     {
-        var property = GetBindingProperty(schemaProperty);
+        var property = Helper.GetParsingProperty(schemaProperty);
         
         var bindingExpression = new ArrayBindingExpression(
             (target, value) => property.SetValue(target, value, null),
@@ -64,7 +65,7 @@ public class StaticHtmlSchemaBuilder<TModel> : IStaticHtmlSchemaBuilder<TModel>
 
     public IStaticHtmlSchemaBuilder<TModel> HasArrayProperty<TValue>(Expression<Func<TModel, TValue[]>> schemaProperty, HtmlSelector htmlSelector, Action<IStaticHtmlSchemaBuilder<TValue>> childBuilder)
     {
-        var property = GetBindingProperty(schemaProperty);
+        var property = Helper.GetParsingProperty(schemaProperty);
 
         var internalSchema = GetInternalSchema(childBuilder, (target, value) =>
         {
@@ -93,17 +94,6 @@ public class StaticHtmlSchemaBuilder<TModel> : IStaticHtmlSchemaBuilder<TModel>
             null,
             typeof(TValue),
             internalSchemaBuilder._bindingExpressions.ToArray());
-    }
-
-    private PropertyInfo GetBindingProperty<TValue>(Expression<Func<TModel, TValue>> schemaProperty)
-    {
-        if (schemaProperty.Body is not MemberExpression memberSelectorExpression)
-        {
-            throw new NotImplementedException();
-        }
-        
-        var property = memberSelectorExpression.Member as PropertyInfo;
-        return property ?? throw new NotImplementedException();
     }
 
     public ICompiledStaticHtmlSchema<TModel> Build()

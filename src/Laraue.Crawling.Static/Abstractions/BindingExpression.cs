@@ -1,4 +1,6 @@
-﻿namespace Laraue.Crawling.Static.Abstractions;
+﻿using Laraue.Crawling.Abstractions;
+
+namespace Laraue.Crawling.Static.Abstractions;
 
 public abstract record BindingExpression(Type ObjectType, Action<object, object?> PropertySetter);
 

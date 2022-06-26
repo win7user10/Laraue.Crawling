@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Laraue.Crawling.Abstractions;
 
 namespace Laraue.Crawling.Static.Abstractions;
 

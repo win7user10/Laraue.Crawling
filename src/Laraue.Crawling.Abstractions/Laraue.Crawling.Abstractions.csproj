@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Laraue.Crawling.Abstractions\Laraue.Crawling.Abstractions.csproj" />
-  </ItemGroup>
-
 </Project>
