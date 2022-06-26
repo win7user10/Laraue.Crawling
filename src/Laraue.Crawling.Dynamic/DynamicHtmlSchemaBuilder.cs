@@ -3,12 +3,12 @@ using Laraue.Crawling.Abstractions;
 
 namespace Laraue.Crawling.Dynamic;
 
-public class DynamicHtmlSchemaBuilder<TModel, TPage> : IDynamicHtmlSchemaBuilder<TModel, TPage>
+public class DynamicHtmlSchemaBuilder<TModel, TPage, TElement> : IDynamicHtmlSchemaBuilder<TModel, TPage, TElement>
 {
     private readonly List<SchemaAction> _actions = new();
     
-    public IDynamicHtmlSchemaBuilder<TModel, TPage> ParseArrayProperty<TValue>(Expression<Func<TModel, TValue[]>> schemaProperty, HtmlSelector htmlSelector,
-        Action<IDynamicHtmlSchemaBuilder<TValue, TPage>> childBuilder)
+    public IDynamicHtmlSchemaBuilder<TModel, TPage, TElement> ParseArrayProperty<TValue>(Expression<Func<TModel, TValue[]>> schemaProperty, HtmlSelector htmlSelector,
+        Action<IDynamicHtmlSchemaBuilder<TValue, TPage, TElement>> childBuilder)
     {
         var property = Helper.GetParsingProperty(schemaProperty);
 
@@ -17,7 +17,7 @@ public class DynamicHtmlSchemaBuilder<TModel, TPage> : IDynamicHtmlSchemaBuilder
             
         });
         
-        var bindingExpression = new ArrayParseExpression(
+        var bindingExpression = new ArrayParseExpression<TElement>(
             (target, value) => property.SetValue(target, value, null),
             htmlSelector,
             typeof(TValue),
@@ -28,35 +28,49 @@ public class DynamicHtmlSchemaBuilder<TModel, TPage> : IDynamicHtmlSchemaBuilder
         return this;
     }
 
-    public IDynamicHtmlSchemaBuilder<TModel, TPage> ParseProperty<TValue>(Expression<Func<TModel, TValue>> schemaProperty, HtmlSelector htmlSelector, Func<IHtmlElement?, TValue?> mapFunction)
+    public IDynamicHtmlSchemaBuilder<TModel, TPage, TElement> ParseProperty<TValue>(
+        Expression<Func<TModel, TValue>> schemaProperty,
+        HtmlSelector htmlSelector,
+        Func<TElement?, Task<TValue?>> mapFunction)
     {
+        var property = Helper.GetParsingProperty(schemaProperty);
+        
+        var bindingExpression = new SimpleTypeParseExpression<TElement>(
+            (target, value) =>  property.SetValue(target, value, null),
+            async x => await mapFunction(x).ConfigureAwait(false),
+            htmlSelector,
+            typeof(TValue));
+        
+        _actions.Add(bindingExpression);
+
         return this;
     }
 
-    public IDynamicHtmlSchemaBuilder<TModel, TPage> ParseProperty<TValue>(Expression<Func<TModel, TValue>> schemaProperty, HtmlSelector htmlSelector, Action<IDynamicHtmlSchemaBuilder<TModel, TPage>> childBuilder)
+    public IDynamicHtmlSchemaBuilder<TModel, TPage, TElement> ParseProperty<TValue>(Expression<Func<TModel, TValue>> schemaProperty, HtmlSelector htmlSelector,
+        Action<IDynamicHtmlSchemaBuilder<TModel, TPage, TElement>> childBuilder)
     {
-        return this;
+        throw new NotImplementedException();
     }
 
-    public ICompiledDynamicHtmlSchema<TModel, TPage> Build()
+    public ICompiledDynamicHtmlSchema<TModel, TPage, TElement> Build()
     {
-        return new CompiledDynamicHtmlSchema<TModel, TPage>(_actions);
+        return new CompiledDynamicHtmlSchema<TModel, TPage, TElement>(_actions);
     }
     
-    private ComplexTypeParseExpression GetInternalSchema<TValue>(Action<IDynamicHtmlSchemaBuilder<TValue, TPage>> childBuilder, Action<object, object?> propertySetter)
+    private ComplexTypeParseExpression<TElement> GetInternalSchema<TValue>(Action<IDynamicHtmlSchemaBuilder<TValue, TPage, TElement>> childBuilder, Action<object, object?> propertySetter)
     {
-        var internalSchemaBuilder = new DynamicHtmlSchemaBuilder<TValue, TPage>();
+        var internalSchemaBuilder = new DynamicHtmlSchemaBuilder<TValue, TPage, TElement>();
         
         childBuilder(internalSchemaBuilder);
 
-        return new ComplexTypeParseExpression(
+        return new ComplexTypeParseExpression<TElement>(
             propertySetter,
             null,
             typeof(TValue),
             internalSchemaBuilder._actions.ToArray());
     }
 
-    public IDynamicHtmlSchemaBuilder<TModel, TPage> ExecuteAsync(Func<TPage, Task> function)
+    public IDynamicHtmlSchemaBuilder<TModel, TPage, TElement> ExecuteAsync(Func<TPage, Task> function)
     {
         _actions.Add(new PageAction<TPage>(function));
         

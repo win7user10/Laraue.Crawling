@@ -29,11 +29,11 @@ public class PuppeteerSharpParserTests
             .ExecuteAsync(page => page.ClickAsync(".j-wba-card-item.j-wba-card-item-show"))
             .ParseArrayProperty(x => x.StatsGroups, ".product-params__table", statGroupsBuilder =>
             {
-                statGroupsBuilder.ParseProperty(x => x.Name, ".product-params__caption", element => element.GetInnerHtml())
+                statGroupsBuilder.ParseProperty(x => x.Name, ".product-params__caption", element => element.GetTrimmedInnerHtmlAsync())
                     .ParseArrayProperty(x => x.Stats, "tr", statsBuilder =>
                     {
-                        statsBuilder.ParseProperty(x => x.Name, "th", element => element.GetInnerHtml())
-                            .ParseProperty(x => x.Value, "td", element => element.GetInnerHtml());
+                        statsBuilder.ParseProperty(x => x.Name, "th", element => element.GetTrimmedInnerHtmlAsync())
+                            .ParseProperty(x => x.Value, "td", element => element.GetTrimmedInnerHtmlAsync());
                     });
             })
             .Build();

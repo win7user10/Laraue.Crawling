@@ -11,27 +11,27 @@ public record ParseAction : SchemaAction
     
 }
 
-public record SimpleTypeParseExpression(
+public record SimpleTypeParseExpression<TElement>(
     Action<object, object?> PropertySetter,
-    Func<IHtmlElement, object?> PropertyGetter,
+    Func<TElement, Task<object?>> AsyncPropertyGetter,
     HtmlSelector? HtmlSelector,
     Type ObjectType)
-        : ParseExpression(ObjectType, PropertySetter);
+        : ParseExpression<TElement>(ObjectType, PropertySetter);
 
-public record ArrayParseExpression(
+public record ArrayParseExpression<TElement>(
     Action<object, object?> PropertySetter,
     HtmlSelector? HtmlSelector,
     Type ObjectType,
-    ParseExpression Element)
-        : ParseExpression(ObjectType, PropertySetter);
+    ParseExpression<TElement> Element)
+        : ParseExpression<TElement>(ObjectType, PropertySetter);
 
-public record ComplexTypeParseExpression(
+public record ComplexTypeParseExpression<TElement>(
     Action<object, object?> PropertySetter,
     HtmlSelector? HtmlSelector,
     Type ObjectType,
     SchemaAction[] Actions)
-    : ParseExpression(ObjectType, PropertySetter);
+    : ParseExpression<TElement>(ObjectType, PropertySetter), IObjectElement;
 
-public abstract record ParseExpression(Type ObjectType, Action<object, object?> PropertySetter) : SchemaAction;
+public abstract record ParseExpression<TElement>(Type ObjectType, Action<object, object?> PropertySetter) : SchemaAction;
 
 public record PageAction<T>(Func<T, Task> AsyncAction) : SchemaAction;
