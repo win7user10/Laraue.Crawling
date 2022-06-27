@@ -27,22 +27,28 @@ public class PuppeteerSharpParserTests
         
         var schema = new DynamicHtmlSchemaBuilder<WildberriesProductPage>()
             .ExecuteAsync(page => page.ClickAsync(".j-wba-card-item.j-wba-card-item-show"))
+            .ParseProperty(x => x.Category, ".product-page__header span")
+            .ParseProperty(x => x.Title, "h1")
             .ParseArrayProperty(x => x.StatsGroups, ".product-params__table", statGroupsBuilder =>
             {
                 statGroupsBuilder.ParseProperty(x => x.Name, ".product-params__caption", element => element.GetTrimmedInnerHtmlAsync())
                     .ParseArrayProperty(x => x.Stats, "tr", statsBuilder =>
                     {
-                        statsBuilder.ParseProperty(x => x.Name, "th", element => element.GetTrimmedInnerHtmlAsync())
-                            .ParseProperty(x => x.Value, "td", element => element.GetTrimmedInnerHtmlAsync());
+                        statsBuilder.ParseProperty(x => x.Name, "th")
+                            .ParseProperty(x => x.Value, "td");
                     });
             })
             .Build();
 
         var parser = new PuppeterSharpParser();
         var result = await parser.VisitAsync(page, schema);
+        
+        Assert.Equal("ZDK", result.Category);
+        Assert.Equal("Сиденье для ванны, стул табурет для ванны и душа, табуретка для купания пожилых, подставка детская", result.Title);
+        Assert.NotEmpty(result.StatsGroups);
     }
 }
 
-record WildberriesProductPage(StatGroup[] StatsGroups);
+record WildberriesProductPage(string Category, string Title, StatGroup[] StatsGroups);
 record StatGroup(string Name, Stat[] Stats);
 record Stat(string Name, string Value);
