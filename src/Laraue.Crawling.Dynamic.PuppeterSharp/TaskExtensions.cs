@@ -2,7 +2,7 @@
 
 public static class TaskExtensions
 {
-    public static async Task<T> AwaitAndModify<T>(this Task<T> task, Func<T, T> modifyValue)
+    public static async Task<TResult> AwaitAndModify<T, TResult>(this Task<T> task, Func<T, TResult> modifyValue)
     {
         var result = await task.ConfigureAwait(false);
 
