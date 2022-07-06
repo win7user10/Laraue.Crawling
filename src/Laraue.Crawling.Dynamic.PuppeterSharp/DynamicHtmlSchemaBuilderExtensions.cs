@@ -11,7 +11,7 @@ public static class DynamicHtmlSchemaBuilderExtensions
         Expression<Func<TModel, string>> schemaProperty,
         HtmlSelector htmlSelector)
     {
-        return schema.ParseProperty(schemaProperty, htmlSelector, element => element.GetTrimmedInnerHtmlAsync());
+        return schema.ParseProperty(schemaProperty, htmlSelector, element => element.GetTrimmedInnerTextAsync());
     }
     
     public static IDynamicHtmlSchemaBuilder<TModel, Page, ElementHandle> ParseProperty<TModel>(
