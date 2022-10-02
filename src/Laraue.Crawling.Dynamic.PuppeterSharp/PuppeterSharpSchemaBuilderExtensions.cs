@@ -9,7 +9,7 @@ public static class PuppeterSharpSchemaBuilderExtensions
 {
     public static HtmlSchemaBuilder<ElementHandle, TModel> HasProperty<TModel>(
         this HtmlSchemaBuilder<ElementHandle, TModel> schema,
-        Expression<Func<TModel, string>> schemaProperty,
+        Expression<Func<TModel, string?>> schemaProperty,
         HtmlSelector htmlSelector)
     {
         return schema.HasProperty(schemaProperty, htmlSelector, async element =>

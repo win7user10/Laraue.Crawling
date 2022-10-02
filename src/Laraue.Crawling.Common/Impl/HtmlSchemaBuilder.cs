@@ -17,7 +17,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
     public readonly List<SchemaExpression<TElement>> BindingExpressions = new ();
     
     public HtmlSchemaBuilder<TElement, TModel> HasProperty<TValue>(
-        Expression<Func<TModel, TValue>> schemaProperty,
+        Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector htmlSelector,
         GetValueDelegate<TElement, TValue> mapFunction)
     {
@@ -35,7 +35,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
     }
 
     public HtmlSchemaBuilder<TElement, TModel> HasProperty<TValue>(
-        Expression<Func<TModel, TValue>> schemaProperty,
+        Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector htmlSelector,
         Action<HtmlSchemaBuilder<TElement, TValue>> childBuilder)
     {
@@ -57,7 +57,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
     }
 
     public HtmlSchemaBuilder<TElement, TModel> HasArrayProperty<TValue>(
-        Expression<Func<TModel, TValue[]>> schemaProperty,
+        Expression<Func<TModel, TValue[]?>> schemaProperty,
         HtmlSelector htmlSelector,
         GetValueDelegate<TElement?, TValue> mapFunction)
     {
@@ -79,7 +79,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
     }
 
     public HtmlSchemaBuilder<TElement, TModel> HasArrayProperty<TValue>(
-        Expression<Func<TModel, TValue[]>> schemaProperty,
+        Expression<Func<TModel, TValue[]?>> schemaProperty,
         HtmlSelector htmlSelector,
         Action<HtmlSchemaBuilder<TElement, TValue>> childBuilder)
     {
