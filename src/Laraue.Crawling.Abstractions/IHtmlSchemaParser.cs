@@ -1,9 +1,9 @@
-﻿namespace Laraue.Crawling.Static.Abstractions;
+﻿namespace Laraue.Crawling.Abstractions;
 
 /// <summary>
-/// <see cref="ICompiledStaticHtmlSchema{TModel}"/> parser.
+/// <see cref="ICompiledHtmlSchema{TElement,TModel}"/> parser.
 /// </summary>
-public interface IStaticHtmlSchemaParser
+public interface IHtmlSchemaParser<TElement>
 {
     /// <summary>
     /// Returns the model from the passed schema and html code.
@@ -12,5 +12,5 @@ public interface IStaticHtmlSchemaParser
     /// <param name="html"></param>
     /// <typeparam name="TModel"></typeparam>
     /// <returns></returns>
-    public TModel Parse<TModel>(ICompiledStaticHtmlSchema<TModel> schema, string html);
+    public TModel? Parse<TModel>(ICompiledHtmlSchema<TElement, TModel> schema, string html);
 }

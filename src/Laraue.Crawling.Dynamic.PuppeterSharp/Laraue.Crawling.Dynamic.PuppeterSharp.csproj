@@ -7,11 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="0.17.1" />
+    <PackageReference Include="PuppeteerSharp" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Laraue.Crawling.Common\Laraue.Crawling.Common.csproj" />
+    <ProjectReference Include="..\Laraue.Crawling.Crawler\Laraue.Crawling.Crawler.csproj" />
   </ItemGroup>
 
 </Project>

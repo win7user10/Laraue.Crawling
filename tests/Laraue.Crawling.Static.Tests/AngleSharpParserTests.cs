@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
-using AngleSharp.Html.Parser;
+using System.Threading.Tasks;
 using Laraue.Crawling.Static.AngleSharp;
-using Laraue.Crawling.Static.Impl;
+using Laraue.Crawling.Static.AngleSharp.Extensions;
 using Xunit;
 
 namespace Laraue.Crawling.Static.Tests;
@@ -10,28 +10,30 @@ namespace Laraue.Crawling.Static.Tests;
 public class AngleSharpParserTests
 {
     [Fact]
-    public void Scheme_ShouldBeParsedCorrectly()
+    public async Task Scheme_ShouldBeParsedCorrectly()
     {
-        var schema = new StaticHtmlSchemaBuilder<OnePage>()
+        var schema = new AngleSharpSchemaBuilder<OnePage>()
             .HasProperty(x => x.Title, ".title")
             .HasProperty(x => x.User, ".user", userBuilder =>
             {
                 userBuilder.HasProperty(x => x.Name, ".name")
-                    .HasProperty(x => x.Age, ".age", x => int.Parse(x.GetInnerHtml()))
+                    .HasProperty(x => x.Age, ".age")
                     .HasArrayProperty(x => x.Dogs, ".dog", dogsBuilder =>
                     {
-                        dogsBuilder.HasProperty(x => x.Age, ".age", x => int.Parse(x.GetInnerHtml()))
+                        dogsBuilder.HasProperty(x => x.Age, ".age")
                             .HasProperty(x => x.Name, ".name");
                     });
             })
-            .HasArrayProperty(x => x.ImageLinks, ".links a", x => x.GetAttribute("href"))
+            .HasArrayProperty(
+                x => x.ImageLinks,
+                ".links a",
+                x => Task.FromResult(x.GetAttributeValue("href")))
             .Build();
 
-        var htmlParser = new HtmlParser();
-        var visitor = new AngleSharpParser(htmlParser);
+        var visitor = new AngleSharpParser();
 
-        var html = File.ReadAllText("test.html");
-        var model = visitor.Parse(schema, html);
+        var html = await File.ReadAllTextAsync("test.html");
+        var model = await visitor.RunAsync(schema, html);
         
         Assert.Equal("Private info", model.Title);
         Assert.Equal("Alex", model.User.Name);

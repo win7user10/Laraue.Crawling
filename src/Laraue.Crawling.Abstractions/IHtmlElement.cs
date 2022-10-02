@@ -1,7 +1,7 @@
-﻿namespace Laraue.Crawling.Static.Abstractions;
+﻿namespace Laraue.Crawling.Abstractions;
 
 /// <summary>
-/// Represents html element in the static scheme.
+/// Represents html element in the static schema.
 /// </summary>
 public interface IHtmlElement
 {

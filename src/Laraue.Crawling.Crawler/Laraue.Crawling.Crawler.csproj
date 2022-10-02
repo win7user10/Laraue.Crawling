@@ -4,14 +4,13 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>Laraue.Crawling.Dynamic</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="0.17.1" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\Laraue.Crawling.Abstractions\Laraue.Crawling.Abstractions.csproj" />
     <ProjectReference Include="..\Laraue.Crawling.Common\Laraue.Crawling.Common.csproj" />
+    <ProjectReference Include="..\Laraue.Crawling.Static\Laraue.Crawling.Static.csproj" />
   </ItemGroup>
 
 </Project>
