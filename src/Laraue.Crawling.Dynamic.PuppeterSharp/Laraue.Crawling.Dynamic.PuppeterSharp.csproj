@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Laraue.Crawling.Common\Laraue.Crawling.Common.csproj" />
     <ProjectReference Include="..\Laraue.Crawling.Dynamic\Laraue.Crawling.Dynamic.csproj" />
   </ItemGroup>
 

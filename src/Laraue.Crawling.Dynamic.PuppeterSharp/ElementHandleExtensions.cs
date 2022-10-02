@@ -1,12 +1,11 @@
 ﻿using System.Text.RegularExpressions;
+using Laraue.Crawling.Common.Extensions;
 using PuppeteerSharp;
 
 namespace Laraue.Crawling.Dynamic.PuppeterSharp;
 
 public static class ElementHandleExtensions
 {
-    public static readonly Regex NonDigitCharsRegex = new(@"[^\d]", RegexOptions.Compiled);
-    public static readonly Regex FloatCharsRegex = new(@"\d+(\.\d+)?", RegexOptions.Compiled);
     
     public static Task<string> GetInnerTextAsync(this ElementHandle elementHandle)
     {
@@ -55,21 +54,11 @@ public static class ElementHandleExtensions
     
     public static Task<int> GetIntAsync(this ElementHandle elementHandle)
     {
-        return GetInnerTextAsync(elementHandle).AwaitAndModify(GetIntAsync);
+        return GetInnerTextAsync(elementHandle).AwaitAndModify(RetrieveExtensions.GetIntOrDefault);
     }
     
     public static Task<decimal> GetDecimalAsync(this ElementHandle elementHandle)
     {
-        return GetInnerTextAsync(elementHandle).AwaitAndModify(GetDecimalAsync);
-    }
-    
-    public static int GetIntAsync(this string str)
-    {
-        return int.Parse(NonDigitCharsRegex.Replace(str, string.Empty));
-    }
-    
-    public static decimal GetDecimalAsync(this string str)
-    {
-        return decimal.Parse(FloatCharsRegex.Match(str).Value);
+        return GetInnerTextAsync(elementHandle).AwaitAndModify(RetrieveExtensions.GetDecimalOrDefault);
     }
 }

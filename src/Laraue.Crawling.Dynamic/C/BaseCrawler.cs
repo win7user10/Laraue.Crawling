@@ -2,28 +2,28 @@
 
 namespace Laraue.Crawling.Dynamic.C;
 
-public abstract class BaseCrawler<TModel, TState> : ICrawler<TModel>
+public abstract class BaseCrawler<TModel, TLink, TState> : ICrawler<TModel>
     where TModel : class
+    where TState : class, new()
 {
-    protected TState? CrawlingState { get; private set; }
+    protected TState CrawlingState { get; private set; } = null!;
 
-    protected abstract ValueTask<TState?> GetInitialStateAsync();
+    protected abstract ValueTask<TState> GetInitialStateAsync();
     
-    public async Task<IAsyncEnumerable<TModel>> RunAsync()
+    protected abstract ValueTask SaveStateAsync();
+    
+    public async Task<IAsyncEnumerable<TModel>> RunAsync(CancellationToken cancellationToken = default)
     {
         CrawlingState = await GetInitialStateAsync();
+
+        var links = GetLinks();
         
-        await ParseSectionLinksAsync();
-        await ParsePageLinksAsync();
-        
-        return ParsePages();
+        return ParsePages(links);
     }
 
-    protected abstract Task ParseSectionLinksAsync();
+    protected abstract IAsyncEnumerable<TLink> GetLinks();
     
-    protected abstract Task ParsePageLinksAsync();
-    
-    protected abstract IAsyncEnumerable<TModel> ParsePages();
+    protected abstract IAsyncEnumerable<TModel> ParsePages(IAsyncEnumerable<TLink> links);
 }
 
 public record BaseInitialState

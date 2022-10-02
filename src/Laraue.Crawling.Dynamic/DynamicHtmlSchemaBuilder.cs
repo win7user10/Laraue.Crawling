@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Laraue.Crawling.Abstractions;
+using Laraue.Crawling.Common;
 
 namespace Laraue.Crawling.Dynamic;
 
@@ -50,6 +51,13 @@ public class DynamicHtmlSchemaBuilder<TModel, TPage, TElement> : IDynamicHtmlSch
         Action<IDynamicHtmlSchemaBuilder<TModel, TPage, TElement>> childBuilder)
     {
         throw new NotImplementedException();
+    }
+
+    public IDynamicHtmlSchemaBuilder<TModel, TPage, TElement> BindExactly(Func<TPage, TElement, IObjectBinder<TModel>, Task> schemaProperty)
+    {
+        _actions.Add(new ComplexTypeBindAction<TModel, TPage, TElement>(schemaProperty));
+        
+        return this;
     }
 
     public ICompiledDynamicHtmlSchema<TModel, TPage, TElement> Build()

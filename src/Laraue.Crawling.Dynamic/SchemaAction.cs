@@ -8,7 +8,6 @@ public record SchemaAction
 
 public record ParseAction : SchemaAction
 {
-    
 }
 
 public record SimpleTypeParseExpression<TElement>(
@@ -31,6 +30,15 @@ public record ComplexTypeParseExpression<TElement>(
     Type ObjectType,
     SchemaAction[] Actions)
     : ParseExpression<TElement>(ObjectType, PropertySetter), IObjectElement;
+
+public record ComplexTypeBindAction<TModel, TPage, TElement> : ComplexTypeBindAction
+{
+    public ComplexTypeBindAction(Func<TPage, TElement, IObjectBinder<TModel>, Task> asyncBindFunction)
+        : base(asyncBindFunction)
+    {
+    }
+}
+public record ComplexTypeBindAction(Delegate AsyncBindFunction) : SchemaAction;
 
 public abstract record ParseExpression<TElement>(Type ObjectType, Action<object, object?> PropertySetter) : SchemaAction;
 

@@ -1,81 +1,96 @@
 ﻿using System.Linq.Expressions;
-using System.Reflection;
 using Laraue.Crawling.Abstractions;
+using Laraue.Crawling.Abstractions.Schema;
+using Laraue.Crawling.Common;
 using Laraue.Crawling.Static.Abstractions;
 
 namespace Laraue.Crawling.Static.Impl;
 
-public class StaticHtmlSchemaBuilder<TModel> : IStaticHtmlSchemaBuilder<TModel>
+/// <summary>
+/// Builder for the static html schema. "Static" means static html,
+/// it will not use a browser for the crawling.
+/// </summary>
+/// <typeparam name="TElement"></typeparam>
+/// <typeparam name="TModel"></typeparam>
+public class StaticHtmlSchemaBuilder<TElement, TModel>
 {
-    private readonly List<BindingExpression> _bindingExpressions = new ();
-
-    public IStaticHtmlSchemaBuilder<TModel> HasProperty<TValue>(
+    private readonly List<BindExpression<TElement>> _bindingExpressions = new ();
+    
+    public StaticHtmlSchemaBuilder<TElement, TModel> HasProperty<TValue>(
         Expression<Func<TModel, TValue>> schemaProperty,
         HtmlSelector htmlSelector,
-        Func<IHtmlElement?, TValue?> mapFunction)
+        GetValueDelegate<TElement, TValue> mapFunction)
     {
         var property = Helper.GetParsingProperty(schemaProperty);
         
-        var bindingExpression = new SimpleTypeBindingExpression(
+        var bindingExpression = new BindValueExpression<TElement>(
+            typeof(TValue),
             (target, value) => property.SetValue(target, value, null),
-            value => mapFunction(value),
             htmlSelector,
-            typeof(TValue));
+            async element => await mapFunction.Invoke(element));
         
         _bindingExpressions.Add(bindingExpression);
 
         return this;
     }
 
-    public IStaticHtmlSchemaBuilder<TModel> HasProperty<TValue>(Expression<Func<TModel, TValue>> schemaProperty, HtmlSelector htmlSelector, Action<IStaticHtmlSchemaBuilder<TValue>> childBuilder)
+    public StaticHtmlSchemaBuilder<TElement, TModel> HasProperty<TValue>(
+        Expression<Func<TModel, TValue>> schemaProperty,
+        HtmlSelector htmlSelector,
+        Action<StaticHtmlSchemaBuilder<TElement, TValue>> childBuilder)
     {
         var property = Helper.GetParsingProperty(schemaProperty);
-        var internalSchema = GetInternalSchema(childBuilder, (target, value) 
-            => property.SetValue(target, value, null));
         
-        var bindingExpression = new ComplexTypeBindingExpression(
+        var internalSchema = GetInternalSchema(
+            childBuilder,
+            (target, value) => property.SetValue(target, value, null));
+        
+        var bindingExpression = new BindObjectExpression<TElement>(
+            typeof(TValue),
             (target, value) => property.SetValue(target, value, null),
             htmlSelector,
-            typeof(TValue),
-            internalSchema.Elements);
+            internalSchema.ChildPropertiesBinders);
         
         _bindingExpressions.Add(bindingExpression);
 
         return this;
     }
 
-    public IStaticHtmlSchemaBuilder<TModel> HasArrayProperty<TValue>(Expression<Func<TModel, TValue[]>> schemaProperty, HtmlSelector htmlSelector, Func<IHtmlElement?, TValue?> mapFunction)
+    public StaticHtmlSchemaBuilder<TElement, TModel> HasArrayProperty<TValue>(
+        Expression<Func<TModel, TValue[]>> schemaProperty,
+        HtmlSelector htmlSelector,
+        GetValueDelegate<TElement?, TValue> mapFunction)
     {
         var property = Helper.GetParsingProperty(schemaProperty);
         
-        var bindingExpression = new ArrayBindingExpression(
+        var bindingExpression = new BindArrayExpression<TElement>(
+            typeof(TValue),
             (target, value) => property.SetValue(target, value, null),
             htmlSelector,
-            typeof(TValue),
-            new SimpleTypeBindingExpression(
+            new BindValueExpression<TElement>(
+                typeof(TValue),
                 (target, value) => property.SetValue(target, value, null),
-                value => mapFunction(value),
                 null,
-                typeof(TValue)));
+                async element => await mapFunction.Invoke(element)));
         
         _bindingExpressions.Add(bindingExpression);
 
         return this;
     }
 
-    public IStaticHtmlSchemaBuilder<TModel> HasArrayProperty<TValue>(Expression<Func<TModel, TValue[]>> schemaProperty, HtmlSelector htmlSelector, Action<IStaticHtmlSchemaBuilder<TValue>> childBuilder)
+    public StaticHtmlSchemaBuilder<TElement, TModel> HasArrayProperty<TValue>(
+        Expression<Func<TModel, TValue[]>> schemaProperty,
+        HtmlSelector htmlSelector,
+        Action<StaticHtmlSchemaBuilder<TElement, TValue>> childBuilder)
     {
         var property = Helper.GetParsingProperty(schemaProperty);
 
-        var internalSchema = GetInternalSchema(childBuilder, (target, value) =>
-        {
-            
-        });
+        var internalSchema = GetInternalSchema(childBuilder);
         
-        var bindingExpression = new ArrayBindingExpression(
+        var bindingExpression = new BindArrayExpression<TElement>(
+            typeof(TValue),
             (target, value) => property.SetValue(target, value, null),
             htmlSelector,
-            typeof(TValue),
             internalSchema);
         
         _bindingExpressions.Add(bindingExpression);
@@ -83,26 +98,28 @@ public class StaticHtmlSchemaBuilder<TModel> : IStaticHtmlSchemaBuilder<TModel>
         return this;
     }
     
-    private ComplexTypeBindingExpression GetInternalSchema<TValue>(Action<IStaticHtmlSchemaBuilder<TValue>> childBuilder, Action<object, object?> propertySetter)
+    private BindObjectExpression<TElement> GetInternalSchema<TValue>(
+        Action<StaticHtmlSchemaBuilder<TElement, TValue>> childBuilder,
+        SetPropertyDelegate? propertySetter = null)
     {
-        var internalSchemaBuilder = new StaticHtmlSchemaBuilder<TValue>();
+        var internalSchemaBuilder = new StaticHtmlSchemaBuilder<TElement, TValue>();
         
         childBuilder(internalSchemaBuilder);
 
-        return new ComplexTypeBindingExpression(
+        return new BindObjectExpression<TElement>(
+            typeof(TValue),
             propertySetter,
             null,
-            typeof(TValue),
             internalSchemaBuilder._bindingExpressions.ToArray());
     }
 
-    public ICompiledStaticHtmlSchema<TModel> Build()
+    public ICompiledStaticHtmlSchema<TElement, TModel> Build()
     {
-        return new CompiledStaticHtmlSchema<TModel>(
-            new ComplexTypeBindingExpression(
-                null,
-                null,
+        return new CompiledStaticHtmlSchema<TElement, TModel>(
+            new BindObjectExpression<TElement>(
                 typeof(TModel),
+                null,
+                null,
                 _bindingExpressions.ToArray()));
     }
 }

@@ -22,6 +22,9 @@ public interface IDynamicHtmlSchemaBuilder<TModel, TPage, TElement>
         Expression<Func<TModel, TValue>> schemaProperty,
         HtmlSelector htmlSelector,
         Action<IDynamicHtmlSchemaBuilder<TModel, TPage, TElement>> childBuilder);
+    
+    IDynamicHtmlSchemaBuilder<TModel, TPage, TElement> BindExactly(
+        Func<TPage, TElement, IObjectBinder<TModel>, Task> schemaProperty);
 
     ICompiledDynamicHtmlSchema<TModel, TPage, TElement> Build();
 }

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Laraue.Crawling.Abstractions\Laraue.Crawling.Abstractions.csproj" />
+    <ProjectReference Include="..\Laraue.Crawling.Common\Laraue.Crawling.Common.csproj" />
   </ItemGroup>
 
 </Project>

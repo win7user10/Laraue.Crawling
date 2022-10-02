@@ -1,10 +1,16 @@
-﻿namespace Laraue.Crawling.Static.Abstractions;
+﻿using Laraue.Crawling.Abstractions.Schema;
+
+namespace Laraue.Crawling.Static.Abstractions;
 
 /// <summary>
 /// Schema ready for the crawling.
 /// </summary>
 /// <typeparam name="TModel"></typeparam>
-public interface ICompiledStaticHtmlSchema<in TModel>
+/// <typeparam name="TElement"></typeparam>
+public interface ICompiledStaticHtmlSchema<TElement, in TModel>
 {
-    public ComplexTypeBindingExpression BindingExpression { get; }
+    /// <summary>
+    /// Schema of the parsing for the current object.
+    /// </summary>
+    public BindObjectExpression<TElement> BindingExpression { get; }
 }

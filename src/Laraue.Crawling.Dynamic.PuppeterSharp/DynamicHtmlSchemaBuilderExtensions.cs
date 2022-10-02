@@ -11,7 +11,15 @@ public static class DynamicHtmlSchemaBuilderExtensions
         Expression<Func<TModel, string>> schemaProperty,
         HtmlSelector htmlSelector)
     {
-        return schema.ParseProperty(schemaProperty, htmlSelector, element => element.GetTrimmedInnerTextAsync());
+        return schema.ParseProperty(schemaProperty, htmlSelector, async element =>
+        {
+            if (element is null)
+            {
+                throw new Exception($"Handle {schemaProperty} error. The element is null.");
+            }
+
+            return await element.GetTrimmedInnerTextAsync();
+        });
     }
     
     public static IDynamicHtmlSchemaBuilder<TModel, Page, ElementHandle> ParseProperty<TModel>(
@@ -19,7 +27,15 @@ public static class DynamicHtmlSchemaBuilderExtensions
         Expression<Func<TModel, int>> schemaProperty,
         HtmlSelector htmlSelector)
     {
-        return schema.ParseProperty(schemaProperty, htmlSelector, element => element.GetIntAsync());
+        return schema.ParseProperty(schemaProperty, htmlSelector, element =>
+        {
+            if (element is null)
+            {
+                throw new Exception($"Handle {schemaProperty} error. The element is null.");
+            }
+            
+            return element.GetIntAsync();
+        });
     }
     
     public static IDynamicHtmlSchemaBuilder<TModel, Page, ElementHandle> ParseProperty<TModel>(

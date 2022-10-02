@@ -1,4 +1,5 @@
 ﻿using Laraue.Crawling.Abstractions;
+using Laraue.Crawling.Common;
 using PuppeteerSharp;
 
 namespace Laraue.Crawling.Dynamic.PuppeterSharp;
@@ -76,12 +77,20 @@ public class PuppeterSharpParser
     {
         var objectInstance = Helper.GetInstanceOfType(objectElement.ObjectType);
 
+        var objectBinderType = typeof(ObjectBinder<>);
+        var typeArgs = new []{ objectElement.ObjectType };
+        var genericObjectBinderType = objectBinderType.MakeGenericType(typeArgs);
+        var objectBinder = Activator.CreateInstance(genericObjectBinderType, objectInstance);
+
         foreach (var action in objectElement.Actions)
         {
             switch (action)
             {
                 case PageAction<TPage> pageAction:
                     await pageAction.AsyncAction(page);
+                    break;
+                case ComplexTypeBindAction bindAction:
+                    await ((Task)bindAction.AsyncBindFunction.DynamicInvoke(page, element, objectBinder)!).ConfigureAwait(false);
                     break;
                 case ParseExpression<ElementHandle> childParseExpression:
                 {
