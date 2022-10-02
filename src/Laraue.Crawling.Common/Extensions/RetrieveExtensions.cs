@@ -15,13 +15,7 @@ public static class RetrieveExtensions
     /// <returns></returns>
     public static int GetIntOrDefault(this string? str)
     {
-        if (string.IsNullOrEmpty(str))
-        {
-            return default;
-        }
-        
-        var intString = NonDigitCharsRegex.Replace(str, string.Empty);
-        return intString.GetAs<int>();
+        return str.GetNumberOrDefault<int>(s => NonDigitCharsRegex.Replace(s, string.Empty));
     }
     
     /// <summary>
@@ -31,13 +25,21 @@ public static class RetrieveExtensions
     /// <returns></returns>
     public static decimal GetDecimalOrDefault(this string? str)
     {
+        return str.GetNumberOrDefault<decimal>(s => FloatCharsRegex.Match(s).Value);
+    }
+
+    private static T GetNumberOrDefault<T>(this string? str, Func<string, string> cleanString) where T : struct
+    {
         if (string.IsNullOrEmpty(str))
         {
             return default;
         }
-        
-        var decString = FloatCharsRegex.Match(str).Value;
-        return decString.GetAs<decimal>();
+
+        var numberString = cleanString(str);
+
+        return string.IsNullOrEmpty(numberString)
+            ? default
+            : numberString.GetAs<T>();
     }
     
     private static T? GetAs<T>(this string str)

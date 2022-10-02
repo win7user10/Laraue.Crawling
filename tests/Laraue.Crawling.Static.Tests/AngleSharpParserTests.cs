@@ -34,7 +34,7 @@ public class AngleSharpParserTests
         var visitor = new AngleSharpParser();
 
         var html = await File.ReadAllTextAsync("test.html");
-        var model = await visitor.ParseAsync(schema, htmlParser.ParseDocument(html).Body);
+        var model = await visitor.RunAsync(schema, htmlParser.ParseDocument(html).Body);
         
         Assert.Equal("Private info", model.Title);
         Assert.Equal("Alex", model.User.Name);

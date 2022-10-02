@@ -6,7 +6,6 @@ namespace Laraue.Crawling.Dynamic.PuppeterSharp;
 
 public static class ElementHandleExtensions
 {
-    
     public static Task<string> GetInnerTextAsync(this ElementHandle elementHandle)
     {
         return elementHandle.EvaluateFunctionAsync<string>("e => e.innerText");

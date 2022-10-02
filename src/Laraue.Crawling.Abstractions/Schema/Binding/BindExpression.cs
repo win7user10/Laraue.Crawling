@@ -1,10 +1,12 @@
-﻿namespace Laraue.Crawling.Abstractions.Schema;
+﻿using Laraue.Crawling.Abstractions.Schema.Delegates;
+
+namespace Laraue.Crawling.Abstractions.Schema.Binding;
 
 /// <summary>
 /// Represents an expression for bind value to the property of the specified type.
 /// </summary>
 /// <typeparam name="TElement">The type of html provider.</typeparam>
-public abstract class BindExpression<TElement>
+public abstract class BindExpression<TElement> : SchemaExpression<TElement>
 {
     /// <summary>
     /// The type of object that this expression is bind.

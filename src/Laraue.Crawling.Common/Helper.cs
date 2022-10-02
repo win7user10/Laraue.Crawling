@@ -22,11 +22,9 @@ public class Helper
     /// Returns property name of the passed <see cref="MemberExpression"/>.
     /// </summary>
     /// <param name="schemaProperty"></param>
-    /// <typeparam name="TModel"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    public static PropertyInfo GetParsingProperty<TModel, TValue>(Expression<Func<TModel, TValue>> schemaProperty)
+    public static PropertyInfo GetParsingProperty(LambdaExpression schemaProperty)
     {
         if (schemaProperty.Body is not MemberExpression memberSelectorExpression)
         {

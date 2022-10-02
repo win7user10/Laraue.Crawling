@@ -107,37 +107,6 @@ public class PuppeteerSharpParserTests
         {
             
         }
-        
-        
-        var schema = new DynamicHtmlSchemaBuilder<WildberriesProductPage>()
-            .ExecuteAsync(page => page.ClickAsync(".j-wba-card-item.j-wba-card-item-show"))
-            .ParseProperty(x => x.Category, ".product-page__header span")
-            .ParseProperty(x => x.Title, "h1")
-            .ParseProperty(x => x.PurchasesCount, ".product-order-quantity")
-            .ParseProperty(x => x.Articul, "#productNmId")
-            .ParseProperty(x => x.Price, ".price-block__final-price")
-            .ParseProperty(x => x.Rating, ".user-opinion__rating-numb")
-            .ParseArrayProperty(x => x.StatsGroups, ".product-params__table", statGroupsBuilder =>
-            {
-                statGroupsBuilder.ParseProperty(x => x.Name, ".product-params__caption", element => element.GetTrimmedInnerTextAsync())
-                    .ParseArrayProperty(x => x.Stats, "tr", statsBuilder =>
-                    {
-                        statsBuilder.ParseProperty(x => x.Name, "th")
-                            .ParseProperty(x => x.Value, "td");
-                    });
-            })
-            .Build();
-
-        var parser = new PuppeterSharpParser();
-        var result = await parser.VisitAsync(page, schema);
-        
-        Assert.Equal("ZDK", result.Category);
-        Assert.Equal("Сиденье для ванны, стул табурет для ванны и душа, табуретка для купания пожилых, подставка детская", result.Title);
-        Assert.NotEmpty(result.StatsGroups);
-        Assert.True(result.PurchasesCount > 50);
-        Assert.Equal(29390438, result.Articul);
-        Assert.True(result.Price > 2000);
-        Assert.True(result.Rating > 4);
     }
 }
 

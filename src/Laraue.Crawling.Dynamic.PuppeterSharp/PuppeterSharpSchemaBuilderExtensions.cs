@@ -1,17 +1,18 @@
 ﻿using System.Linq.Expressions;
 using Laraue.Crawling.Abstractions;
+using Laraue.Crawling.Common.Impl;
 using PuppeteerSharp;
 
 namespace Laraue.Crawling.Dynamic.PuppeterSharp;
 
-public static class DynamicHtmlSchemaBuilderExtensions
+public static class PuppeterSharpSchemaBuilderExtensions
 {
-    public static IDynamicHtmlSchemaBuilder<TModel, Page, ElementHandle> ParseProperty<TModel>(
-        this IDynamicHtmlSchemaBuilder<TModel, Page, ElementHandle> schema,
+    public static HtmlSchemaBuilder<ElementHandle, TModel> HasProperty<TModel>(
+        this HtmlSchemaBuilder<ElementHandle, TModel> schema,
         Expression<Func<TModel, string>> schemaProperty,
         HtmlSelector htmlSelector)
     {
-        return schema.ParseProperty(schemaProperty, htmlSelector, async element =>
+        return schema.HasProperty(schemaProperty, htmlSelector, async element =>
         {
             if (element is null)
             {
@@ -22,12 +23,12 @@ public static class DynamicHtmlSchemaBuilderExtensions
         });
     }
     
-    public static IDynamicHtmlSchemaBuilder<TModel, Page, ElementHandle> ParseProperty<TModel>(
-        this IDynamicHtmlSchemaBuilder<TModel, Page, ElementHandle> schema,
+    public static HtmlSchemaBuilder<ElementHandle, TModel> HasProperty<TModel>(
+        this HtmlSchemaBuilder<ElementHandle, TModel> schema,
         Expression<Func<TModel, int>> schemaProperty,
         HtmlSelector htmlSelector)
     {
-        return schema.ParseProperty(schemaProperty, htmlSelector, element =>
+        return schema.HasProperty(schemaProperty, htmlSelector, element =>
         {
             if (element is null)
             {
@@ -38,11 +39,11 @@ public static class DynamicHtmlSchemaBuilderExtensions
         });
     }
     
-    public static IDynamicHtmlSchemaBuilder<TModel, Page, ElementHandle> ParseProperty<TModel>(
-        this IDynamicHtmlSchemaBuilder<TModel, Page, ElementHandle> schema,
+    public static HtmlSchemaBuilder<ElementHandle, TModel> HasProperty<TModel>(
+        this HtmlSchemaBuilder<ElementHandle, TModel> schema,
         Expression<Func<TModel, decimal>> schemaProperty,
         HtmlSelector htmlSelector)
     {
-        return schema.ParseProperty(schemaProperty, htmlSelector, element => element.GetDecimalAsync());
+        return schema.HasProperty(schemaProperty, htmlSelector, element => element.GetDecimalAsync());
     }
 }

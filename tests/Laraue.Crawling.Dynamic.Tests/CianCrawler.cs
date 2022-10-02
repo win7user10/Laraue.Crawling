@@ -1,6 +1,6 @@
 ﻿using Laraue.Crawling.Common.Extensions;
-using Laraue.Crawling.Dynamic.C;
 using Laraue.Crawling.Dynamic.PuppeterSharp;
+using Laraue.Crawling.Static.AngleSharp;
 using Microsoft.Extensions.Logging;
 using PuppeteerSharp;
 
@@ -34,10 +34,10 @@ public class CianCrawler : BaseFileCrawler<CianPages, string, CrawlerState>
 
     protected override async IAsyncEnumerable<CianPages> ParsePages(IAsyncEnumerable<string> links)
     {
-        var schema = new DynamicHtmlSchemaBuilder<CianPages>()
-            .ParseArrayProperty(x => x.Pages, "article", pageBuilder =>
+        var schema = new PuppeterSharpSchemaBuilder<CianPages>()
+            .HasArrayProperty(x => x.Pages, "article", pageBuilder =>
             {
-                pageBuilder.BindExactly(async (_, element, modelBinder) =>
+                pageBuilder.BindManually(async (element, modelBinder) =>
                 {
                     var titleElement = await element.QuerySelectorAsync("span[data-mark=OfferTitle]");
                     var subTitleElement = await element.QuerySelectorAsync("span[data-mark=OfferSubtitle]");
@@ -69,7 +69,7 @@ public class CianCrawler : BaseFileCrawler<CianPages, string, CrawlerState>
                     modelBinder.BindProperty(x => x.TotalFloorsNumber, totalFloors);
                 });
 
-                pageBuilder.BindExactly(async (_, element, modelBinder) =>
+                pageBuilder.BindManually(async (element, modelBinder) =>
                 {
                     var subElement = await element.QuerySelectorAsync("div[data-name=SpecialGeo] > div");
                     if (subElement is null)
@@ -88,12 +88,12 @@ public class CianCrawler : BaseFileCrawler<CianPages, string, CrawlerState>
                     modelBinder.BindProperty(x => x.TransportDistanceType, distanceType);
                 });
                 
-                pageBuilder.ParseProperty(x => x.PublicTransportStop, "div[data-name=SpecialGeo] a");
+                pageBuilder.HasProperty(x => x.PublicTransportStop, "div[data-name=SpecialGeo] a");
 
-                pageBuilder.ParseProperty(x => x.Id, "div[data-name=LinkArea] a", handle
+                pageBuilder.HasProperty(x => x.Id, "div[data-name=LinkArea] a", handle
                     => handle.GetAttributeValueAsync("href").AwaitAndModify(x => x.GetIntOrDefault()));
-                pageBuilder.ParseProperty(x => x.TotalPrice, "span[data-mark=MainPrice]");
-                pageBuilder.ParseProperty(x => x.OneMeterPrice, "p[data-mark=PriceInfo]");
+                pageBuilder.HasProperty(x => x.TotalPrice, "span[data-mark=MainPrice]");
+                pageBuilder.HasProperty(x => x.OneMeterPrice, "p[data-mark=PriceInfo]");
             })
             .Build();
         
@@ -114,8 +114,9 @@ public class CianCrawler : BaseFileCrawler<CianPages, string, CrawlerState>
             {
                 yield break;
             }
-            
-            yield return await parser.VisitAsync(page, schema);
+
+            var element = await page.QuerySelectorAsync("body");
+            yield return await parser.RunAsync(schema, element);
         }
     }
 

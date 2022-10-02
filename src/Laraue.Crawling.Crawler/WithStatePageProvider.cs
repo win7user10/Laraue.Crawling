@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace Laraue.Crawling.Dynamic.C;
+namespace Laraue.Crawling.Dynamic;
 
 public abstract class WithStatePageProvider : IPagesProvider
 {

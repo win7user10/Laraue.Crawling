@@ -1,9 +1,8 @@
 ﻿using Laraue.Crawling.Abstractions;
 using Laraue.Crawling.Abstractions.Schema;
-using Laraue.Crawling.Common;
-using Laraue.Crawling.Static.Abstractions;
+using Laraue.Crawling.Abstractions.Schema.Binding;
 
-namespace Laraue.Crawling.Static.Impl;
+namespace Laraue.Crawling.Common.Impl;
 
 public abstract class BaseHtmlSchemaParser<TElement>
 {
@@ -14,9 +13,13 @@ public abstract class BaseHtmlSchemaParser<TElement>
     /// <param name="rootElement"></param>
     /// <typeparam name="TModel"></typeparam>
     /// <returns></returns>
-    public abstract Task<TModel?> ParseAsync<TModel>(
-        ICompiledStaticHtmlSchema<TElement, TModel> schema,
-        TElement? rootElement);
+    public async Task<TModel?> RunAsync<TModel>(
+        ICompiledHtmlSchema<TElement, TModel> schema,
+        TElement? rootElement)
+    {
+        return (TModel?) await ParseAsync((BindExpression<TElement>)schema.BindingExpression, rootElement)
+            .ConfigureAwait(false);
+    }
     
     /// <summary>
     /// Method for routing between all possible parsing expressions.
@@ -25,7 +28,7 @@ public abstract class BaseHtmlSchemaParser<TElement>
     /// <param name="document"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    protected Task<object?> ParseAsync(BindExpression<TElement> bindingExpression, TElement? document)
+    private Task<object?> ParseAsync(BindExpression<TElement> bindingExpression, TElement? document)
     {
         if (document is null)
         {
@@ -60,7 +63,7 @@ public abstract class BaseHtmlSchemaParser<TElement>
     private async Task<object?> ParseAsync(BindObjectExpression<TElement> complexType, TElement document)
     {
         var intermediateNode = complexType.HtmlSelector is not null
-            ? await GetElementAsync(document,complexType.HtmlSelector.Selector)
+            ? await GetElementAsync(document,complexType.HtmlSelector.Selector).ConfigureAwait(false)
             : document;
 
         if (intermediateNode is null)
@@ -69,22 +72,70 @@ public abstract class BaseHtmlSchemaParser<TElement>
         }
 
         var objectInstance = Helper.GetInstanceOfType(complexType.ObjectType);
+        var objectBinder = ObjectBinderFactory.ForObject(objectInstance);
+        
         foreach (var element in complexType.ChildPropertiesBinders)
         {
-            var value = await ParseAsync(element, intermediateNode);
-            element.PropertySetter?.Invoke(objectInstance, value);
+            await ProcessSchemaExpressionAsync(element, document, objectBinder, objectInstance);
         }
 
         return objectInstance;
     }
+
+    protected virtual Task ProcessSchemaExpressionAsync(
+        SchemaExpression<TElement> schemaExpression,
+        TElement currentElement,
+        IObjectBinder objectBinder,
+        object objectInstance)
+    {
+        return schemaExpression switch
+        {
+            BindExpression<TElement> bindExpression => ProcessBindExpressionAsync(
+                bindExpression,
+                currentElement,
+                objectInstance),
+            ActionExpression<TElement> actionExpression => ProcessActionExpressionAsync(
+                actionExpression,
+                currentElement),
+            ManualBindExpression<TElement> manualBindExpression => ProcessManualBindExpressionAsync(
+                manualBindExpression,
+                currentElement,
+                objectBinder),
+            _ => throw new InvalidOperationException(),
+        };
+    }
     
+    private async Task ProcessBindExpressionAsync(
+        BindExpression<TElement> bindExpression,
+        TElement currentElement,
+        object objectInstance)
+    {
+        var value = await ParseAsync(bindExpression, currentElement).ConfigureAwait(false);
+        bindExpression.PropertySetter?.Invoke(objectInstance, value);
+    }
+    
+    private Task ProcessActionExpressionAsync(
+        ActionExpression<TElement> actionExpression,
+        TElement currentElement)
+    {
+        return actionExpression.AsyncAction(currentElement);
+    }
+    
+    private Task ProcessManualBindExpressionAsync(
+        ManualBindExpression<TElement> actionExpression,
+        TElement currentElement,
+        IObjectBinder objectBinder)
+    {
+        return (Task)actionExpression.AsyncBindFunction.DynamicInvoke(currentElement, objectBinder)!;
+    }
+
     private async Task<object?> ParseAsync(BindValueExpression<TElement> simpleType, TElement document)
     {
         var documentToParse = document;
         
         if (simpleType.HtmlSelector is not null)
         {
-            documentToParse = await GetElementAsync(document, simpleType.HtmlSelector.Selector);
+            documentToParse = await GetElementAsync(document, simpleType.HtmlSelector.Selector).ConfigureAwait(false);
         }
 
         if (documentToParse is null)
@@ -100,7 +151,7 @@ public abstract class BaseHtmlSchemaParser<TElement>
         TElement[]? children = null;
         if (arrayType.HtmlSelector is not null)
         {
-            children = await GetElementsAsync(document, arrayType.HtmlSelector.Selector);
+            children = await GetElementsAsync(document, arrayType.HtmlSelector.Selector).ConfigureAwait(false);
         }
         
         if (children is null)
@@ -113,7 +164,7 @@ public abstract class BaseHtmlSchemaParser<TElement>
         for (var i = 0; i < children.Length; i++)
         {
             var child = children[i];
-            var value = await ParseAsync(arrayType.Element, child);
+            var value = await ParseAsync(arrayType.Element, child).ConfigureAwait(false);
             result[i] = value;
         }
         

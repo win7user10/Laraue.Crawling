@@ -1,4 +1,4 @@
-﻿namespace Laraue.Crawling.Abstractions.Schema;
+﻿namespace Laraue.Crawling.Abstractions.Schema.Delegates;
 
 public delegate Task<TValue?> GetValueDelegate<in TElement, TValue>(TElement element);
 

@@ -1,4 +1,4 @@
-﻿namespace Laraue.Crawling.Dynamic.C;
+﻿namespace Laraue.Crawling.Dynamic;
 
 /// <summary>
 /// Class which provides links to be parsed.

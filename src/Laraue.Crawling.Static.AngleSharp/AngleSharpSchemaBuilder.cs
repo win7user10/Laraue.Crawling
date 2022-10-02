@@ -1,8 +1,8 @@
 ﻿using AngleSharp.Dom;
-using Laraue.Crawling.Static.Impl;
+using Laraue.Crawling.Common.Impl;
 
 namespace Laraue.Crawling.Static.AngleSharp;
 
-public class AngleSharpSchemaBuilder<TModel> : StaticHtmlSchemaBuilder<IElement, TModel>
+public class AngleSharpSchemaBuilder<TModel> : HtmlSchemaBuilder<IElement, TModel>
 {
 }

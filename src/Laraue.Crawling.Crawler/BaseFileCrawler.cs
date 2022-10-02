@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Laraue.Crawling.Dynamic.C;
+namespace Laraue.Crawling.Dynamic;
 
 public abstract class BaseFileCrawler<TModel, TLink, TState> : BaseCrawler<TModel, TLink, TState>
     where TModel : class

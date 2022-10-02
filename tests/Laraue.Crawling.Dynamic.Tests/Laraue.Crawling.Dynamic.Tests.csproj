@@ -30,6 +30,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\..\src\Laraue.Crawling.Dynamic.PuppeterSharp\Laraue.Crawling.Dynamic.PuppeterSharp.csproj" />
+    <ProjectReference Include="..\..\src\Laraue.Crawling.Static.AngleSharp\Laraue.Crawling.Static.AngleSharp.csproj" />
   </ItemGroup>
 
 </Project>

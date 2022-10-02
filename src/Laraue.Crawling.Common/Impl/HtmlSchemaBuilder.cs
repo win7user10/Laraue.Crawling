@@ -1,10 +1,10 @@
 ﻿using System.Linq.Expressions;
 using Laraue.Crawling.Abstractions;
 using Laraue.Crawling.Abstractions.Schema;
-using Laraue.Crawling.Common;
-using Laraue.Crawling.Static.Abstractions;
+using Laraue.Crawling.Abstractions.Schema.Binding;
+using Laraue.Crawling.Abstractions.Schema.Delegates;
 
-namespace Laraue.Crawling.Static.Impl;
+namespace Laraue.Crawling.Common.Impl;
 
 /// <summary>
 /// Builder for the static html schema. "Static" means static html,
@@ -12,11 +12,11 @@ namespace Laraue.Crawling.Static.Impl;
 /// </summary>
 /// <typeparam name="TElement"></typeparam>
 /// <typeparam name="TModel"></typeparam>
-public class StaticHtmlSchemaBuilder<TElement, TModel>
+public class HtmlSchemaBuilder<TElement, TModel>
 {
-    private readonly List<BindExpression<TElement>> _bindingExpressions = new ();
+    public readonly List<SchemaExpression<TElement>> BindingExpressions = new ();
     
-    public StaticHtmlSchemaBuilder<TElement, TModel> HasProperty<TValue>(
+    public HtmlSchemaBuilder<TElement, TModel> HasProperty<TValue>(
         Expression<Func<TModel, TValue>> schemaProperty,
         HtmlSelector htmlSelector,
         GetValueDelegate<TElement, TValue> mapFunction)
@@ -29,15 +29,15 @@ public class StaticHtmlSchemaBuilder<TElement, TModel>
             htmlSelector,
             async element => await mapFunction.Invoke(element));
         
-        _bindingExpressions.Add(bindingExpression);
+        BindingExpressions.Add(bindingExpression);
 
         return this;
     }
 
-    public StaticHtmlSchemaBuilder<TElement, TModel> HasProperty<TValue>(
+    public HtmlSchemaBuilder<TElement, TModel> HasProperty<TValue>(
         Expression<Func<TModel, TValue>> schemaProperty,
         HtmlSelector htmlSelector,
-        Action<StaticHtmlSchemaBuilder<TElement, TValue>> childBuilder)
+        Action<HtmlSchemaBuilder<TElement, TValue>> childBuilder)
     {
         var property = Helper.GetParsingProperty(schemaProperty);
         
@@ -51,12 +51,12 @@ public class StaticHtmlSchemaBuilder<TElement, TModel>
             htmlSelector,
             internalSchema.ChildPropertiesBinders);
         
-        _bindingExpressions.Add(bindingExpression);
+        BindingExpressions.Add(bindingExpression);
 
         return this;
     }
 
-    public StaticHtmlSchemaBuilder<TElement, TModel> HasArrayProperty<TValue>(
+    public HtmlSchemaBuilder<TElement, TModel> HasArrayProperty<TValue>(
         Expression<Func<TModel, TValue[]>> schemaProperty,
         HtmlSelector htmlSelector,
         GetValueDelegate<TElement?, TValue> mapFunction)
@@ -73,15 +73,15 @@ public class StaticHtmlSchemaBuilder<TElement, TModel>
                 null,
                 async element => await mapFunction.Invoke(element)));
         
-        _bindingExpressions.Add(bindingExpression);
+        BindingExpressions.Add(bindingExpression);
 
         return this;
     }
 
-    public StaticHtmlSchemaBuilder<TElement, TModel> HasArrayProperty<TValue>(
+    public HtmlSchemaBuilder<TElement, TModel> HasArrayProperty<TValue>(
         Expression<Func<TModel, TValue[]>> schemaProperty,
         HtmlSelector htmlSelector,
-        Action<StaticHtmlSchemaBuilder<TElement, TValue>> childBuilder)
+        Action<HtmlSchemaBuilder<TElement, TValue>> childBuilder)
     {
         var property = Helper.GetParsingProperty(schemaProperty);
 
@@ -93,16 +93,16 @@ public class StaticHtmlSchemaBuilder<TElement, TModel>
             htmlSelector,
             internalSchema);
         
-        _bindingExpressions.Add(bindingExpression);
+        BindingExpressions.Add(bindingExpression);
 
         return this;
     }
     
     private BindObjectExpression<TElement> GetInternalSchema<TValue>(
-        Action<StaticHtmlSchemaBuilder<TElement, TValue>> childBuilder,
+        Action<HtmlSchemaBuilder<TElement, TValue>> childBuilder,
         SetPropertyDelegate? propertySetter = null)
     {
-        var internalSchemaBuilder = new StaticHtmlSchemaBuilder<TElement, TValue>();
+        var internalSchemaBuilder = new HtmlSchemaBuilder<TElement, TValue>();
         
         childBuilder(internalSchemaBuilder);
 
@@ -110,16 +110,30 @@ public class StaticHtmlSchemaBuilder<TElement, TModel>
             typeof(TValue),
             propertySetter,
             null,
-            internalSchemaBuilder._bindingExpressions.ToArray());
+            internalSchemaBuilder.BindingExpressions.ToArray());
+    }
+    
+    public HtmlSchemaBuilder<TElement, TModel> BindManually(Func<TElement, IObjectBinder<TModel>, Task> schemaProperty)
+    {
+        BindingExpressions.Add(new ManualBindExpression<TElement, TModel>(schemaProperty));
+        
+        return this;
+    }
+    
+    public HtmlSchemaBuilder<TElement, TModel> ExecuteAsync(Func<TElement, Task> function)
+    {
+        BindingExpressions.Add(new ActionExpression<TElement>(function));
+        
+        return this;
     }
 
-    public ICompiledStaticHtmlSchema<TElement, TModel> Build()
+    public ICompiledHtmlSchema<TElement, TModel> Build()
     {
-        return new CompiledStaticHtmlSchema<TElement, TModel>(
+        return new CompiledHtmlSchema<TElement, TModel>(
             new BindObjectExpression<TElement>(
                 typeof(TModel),
                 null,
                 null,
-                _bindingExpressions.ToArray()));
+                BindingExpressions.ToArray()));
     }
 }

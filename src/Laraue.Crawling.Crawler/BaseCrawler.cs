@@ -1,6 +1,6 @@
 ﻿using Laraue.Crawling.Abstractions;
 
-namespace Laraue.Crawling.Dynamic.C;
+namespace Laraue.Crawling.Dynamic;
 
 public abstract class BaseCrawler<TModel, TLink, TState> : ICrawler<TModel>
     where TModel : class

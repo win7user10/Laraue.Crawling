@@ -14,5 +14,10 @@ public interface IObjectBinder<T>
     /// <param name="selector"></param>
     /// <param name="value"></param>
     /// <typeparam name="TProperty"></typeparam>
-    public void BindProperty<TProperty>(Expression<Func<T, TProperty>> selector, TProperty value);
+    public void BindProperty<TProperty>(Expression<Func<T, TProperty?>> selector, TProperty? value);
+}
+
+public interface IObjectBinder
+{
+    public void BindProperty(LambdaExpression selector, object? value);
 }

@@ -1,4 +1,6 @@
-﻿namespace Laraue.Crawling.Abstractions.Schema;
+﻿using Laraue.Crawling.Abstractions.Schema.Delegates;
+
+namespace Laraue.Crawling.Abstractions.Schema.Binding;
 
 /// <summary>
 /// Represents how to parse array property of the specified type.

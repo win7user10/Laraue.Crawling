@@ -2,7 +2,7 @@
 using System.Text.Json;
 using AngleSharp.Dom;
 using Laraue.Crawling.Abstractions;
-using Laraue.Crawling.Static.Impl;
+using Laraue.Crawling.Common.Impl;
 
 namespace Laraue.Crawling.Static.AngleSharp;
 
@@ -17,8 +17,8 @@ public static class AngleSharpSchemaBuilderExtensions
     /// <typeparam name="TModel"></typeparam>
     /// <typeparam name="TValue"></typeparam>
     /// <returns></returns>
-    public static StaticHtmlSchemaBuilder<IElement, TModel> HasProperty<TModel, TValue>(
-        this StaticHtmlSchemaBuilder<IElement, TModel> schemaBuilder,
+    public static HtmlSchemaBuilder<IElement, TModel> HasProperty<TModel, TValue>(
+        this HtmlSchemaBuilder<IElement, TModel> schemaBuilder,
         Expression<Func<TModel, TValue>> schemaProperty,
         HtmlSelector htmlSelector)
     {

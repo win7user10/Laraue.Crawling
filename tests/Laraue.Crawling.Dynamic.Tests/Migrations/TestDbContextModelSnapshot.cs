@@ -22,7 +22,7 @@ namespace Laraue.Crawling.Dynamic.Tests.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Laraue.Crawling.Dynamic.Tests.CianPage", b =>
+            modelBuilder.Entity("Laraue.Crawling.Crawler.Tests.CianPage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
