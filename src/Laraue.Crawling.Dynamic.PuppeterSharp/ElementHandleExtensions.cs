@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Laraue.Crawling.Common.Extensions;
+﻿using Laraue.Crawling.Common.Extensions;
 using PuppeteerSharp;
 
 namespace Laraue.Crawling.Dynamic.PuppeterSharp;

@@ -1,5 +1,4 @@
-﻿using Laraue.Crawling.Abstractions.Schema;
-using Laraue.Crawling.Abstractions.Schema.Binding;
+﻿using Laraue.Crawling.Abstractions.Schema.Binding;
 
 namespace Laraue.Crawling.Abstractions;
 

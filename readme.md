@@ -17,10 +17,10 @@ record Dog(string Name, int Age);
 
 var schema = new HtmlSchemaBuilder<User>()
     .HasProperty(x => x.Name, ".name")
-    .HasProperty(x => x.Age, ".age", ageElement => int.Parse(ageElement.GetInnerHtml()))
+    .HasProperty(x => x.Age, ".age")
     .HasArrayProperty(x => x.Dogs, ".dog", dogsBuilder =>
     {
-        dogsBuilder.HasProperty(x => x.Age, ".age", x => int.Parse(x.GetInnerHtml()))
+        dogsBuilder.HasProperty(x => x.Age, ".age")
             .HasProperty(x => x.Name, ".name");
     });
     .Build();

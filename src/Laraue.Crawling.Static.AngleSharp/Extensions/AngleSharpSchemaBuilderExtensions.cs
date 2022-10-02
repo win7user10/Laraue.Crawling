@@ -4,7 +4,7 @@ using AngleSharp.Dom;
 using Laraue.Crawling.Abstractions;
 using Laraue.Crawling.Common.Impl;
 
-namespace Laraue.Crawling.Static.AngleSharp;
+namespace Laraue.Crawling.Static.AngleSharp.Extensions;
 
 public static class AngleSharpSchemaBuilderExtensions
 {

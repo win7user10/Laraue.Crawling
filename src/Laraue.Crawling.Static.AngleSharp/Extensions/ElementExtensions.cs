@@ -1,6 +1,6 @@
 ﻿using AngleSharp.Dom;
 
-namespace Laraue.Crawling.Static.AngleSharp;
+namespace Laraue.Crawling.Static.AngleSharp.Extensions;
 
 public static class ElementExtensions
 {

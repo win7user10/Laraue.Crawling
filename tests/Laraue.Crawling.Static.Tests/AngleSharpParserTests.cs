@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using AngleSharp.Html.Parser;
 using Laraue.Crawling.Static.AngleSharp;
+using Laraue.Crawling.Static.AngleSharp.Extensions;
 using Xunit;
 
 namespace Laraue.Crawling.Static.Tests;
@@ -30,11 +30,10 @@ public class AngleSharpParserTests
                 x => Task.FromResult(x.GetAttributeValue("href")))
             .Build();
 
-        var htmlParser = new HtmlParser();
         var visitor = new AngleSharpParser();
 
         var html = await File.ReadAllTextAsync("test.html");
-        var model = await visitor.RunAsync(schema, htmlParser.ParseDocument(html).Body);
+        var model = await visitor.RunAsync(schema, html);
         
         Assert.Equal("Private info", model.Title);
         Assert.Equal("Alex", model.User.Name);
