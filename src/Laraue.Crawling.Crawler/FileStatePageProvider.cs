@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Laraue.Crawling.Dynamic;
+namespace Laraue.Crawling.Crawler;
 
 public class FileStatePageProvider : WithStatePageProvider
 {

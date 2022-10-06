@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Laraue.Crawling.Static.AngleSharp;
 using Laraue.Crawling.Static.AngleSharp.Extensions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
 namespace Laraue.Crawling.Static.Tests;
@@ -30,7 +31,7 @@ public class AngleSharpParserTests
                 x => Task.FromResult(x.GetAttributeValue("href")))
             .Build();
 
-        var visitor = new AngleSharpParser();
+        var visitor = new AngleSharpParser(new NullLoggerFactory());
 
         var html = await File.ReadAllTextAsync("test.html");
         var model = await visitor.RunAsync(schema, html);

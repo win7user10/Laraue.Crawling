@@ -19,4 +19,9 @@ public record HtmlSelector
     {
         return new HtmlSelector { Selector = selector };
     }
+
+    public override string ToString()
+    {
+        return Selector;
+    }
 };

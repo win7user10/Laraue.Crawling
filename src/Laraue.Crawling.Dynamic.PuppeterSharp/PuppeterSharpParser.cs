@@ -1,22 +1,27 @@
 ﻿using Laraue.Crawling.Abstractions;
 using Laraue.Crawling.Common.Impl;
+using Microsoft.Extensions.Logging;
 using PuppeteerSharp;
 
 namespace Laraue.Crawling.Dynamic.PuppeterSharp;
 
 public class PuppeterSharpParser : BaseHtmlSchemaParser<ElementHandle>
 {
-    protected override async Task<ElementHandle?> GetElementAsync(
+    public PuppeterSharpParser(ILoggerFactory loggerFactory) : base(loggerFactory)
+    {
+    }
+    
+    protected override Task<ElementHandle?> GetElementAsync(
         ElementHandle currentElement,
         HtmlSelector htmlSelector)
     {
-        return await currentElement.QuerySelectorAsync(htmlSelector.Selector).ConfigureAwait(false);
+        return currentElement.QuerySelectorAsync(htmlSelector.Selector);
     }
 
-    protected override async Task<ElementHandle[]?> GetElementsAsync(
+    protected override Task<ElementHandle[]?> GetElementsAsync(
         ElementHandle currentElement,
         HtmlSelector htmlSelector)
     {
-        return await currentElement.QuerySelectorAllAsync(htmlSelector.Selector).ConfigureAwait(false);
+        return currentElement.QuerySelectorAllAsync(htmlSelector.Selector);
     }
 }

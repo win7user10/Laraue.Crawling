@@ -1,12 +1,15 @@
 ﻿using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using Laraue.Crawling.Abstractions;
+using Laraue.Crawling.Common.Impl;
+using Microsoft.Extensions.Logging;
 
 namespace Laraue.Crawling.Common;
 
 public class ObjectBinder<T> : ObjectBinder, IObjectBinder<T>
 {
-    public ObjectBinder(T instance) : base(instance)
+    public ObjectBinder(T instance, ILoggerFactory loggerFactory, VisitorContext visitorContext)
+        : base(instance, loggerFactory.CreateLogger<ObjectBinder<T>>(), visitorContext)
     {
     }
 
@@ -19,10 +22,14 @@ public class ObjectBinder<T> : ObjectBinder, IObjectBinder<T>
 public class ObjectBinder : IObjectBinder
 {
     private readonly object? _instance;
-    
-    public ObjectBinder(object? instance)
+    private readonly ILogger<ObjectBinder> _logger;
+    private readonly VisitorContext _visitorContext;
+
+    public ObjectBinder(object? instance, ILogger<ObjectBinder> logger, VisitorContext visitorContext)
     {
         _instance = instance;
+        _logger = logger;
+        _visitorContext = visitorContext;
     }
     
     public void BindProperty(LambdaExpression selector, object? value)
@@ -33,6 +40,10 @@ public class ObjectBinder : IObjectBinder
         {
             return;
         }
+
+        var propertyContext = _visitorContext.Push(propertyInfo.Name);
+        
+        _logger.LogTrace("Bind Property: {Path} Value: {Value}", propertyContext, value);
         
         propertyInfo.SetValue(_instance, value);
     }
@@ -42,7 +53,7 @@ public sealed class ObjectBinderFactory
 {
     private static readonly ConcurrentDictionary<Type, Type> BinderTypes = new ();
 
-    public static IObjectBinder ForObject(object objectInstance)
+    public static IObjectBinder ForObject(object objectInstance, ILoggerFactory loggerFactory, VisitorContext context)
     {
         var objectType = objectInstance.GetType();
         
@@ -54,6 +65,6 @@ public sealed class ObjectBinderFactory
             BinderTypes.TryAdd(objectType, binderType);
         }
         
-        return (IObjectBinder)Activator.CreateInstance(binderType, objectInstance)!;
+        return (IObjectBinder)Activator.CreateInstance(binderType, objectInstance, loggerFactory, context)!;
     }
 }

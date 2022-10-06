@@ -1,6 +1,4 @@
-﻿using Laraue.Crawling.Abstractions.Schema.Delegates;
-
-namespace Laraue.Crawling.Abstractions.Schema.Binding;
+﻿namespace Laraue.Crawling.Abstractions.Schema.Binding;
 
 /// <summary>
 /// Represents how to parse array property of the specified type.
@@ -11,10 +9,10 @@ public sealed class BindArrayExpression<TElement> : BindExpression<TElement>
     
     public BindArrayExpression(
         Type objectType,
-        SetPropertyDelegate? propertySetter,
+        SetPropertyInfo? setPropertyInfo,
         HtmlSelector? htmlSelector,
         BindExpression<TElement> element)
-        : base(objectType, propertySetter, htmlSelector)
+        : base(objectType, setPropertyInfo, htmlSelector)
     {
         Element = element;
     }

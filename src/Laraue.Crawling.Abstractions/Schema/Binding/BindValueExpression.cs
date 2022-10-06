@@ -12,10 +12,10 @@ public sealed class BindValueExpression<TElement> : BindExpression<TElement>
 
     public BindValueExpression(
         Type objectType,
-        SetPropertyDelegate? propertySetter,
+        SetPropertyInfo? setPropertyInfo,
         HtmlSelector? htmlSelector,
         GetObjectValueDelegate<TElement> propertyGetter)
-        : base(objectType, propertySetter, htmlSelector)
+        : base(objectType, setPropertyInfo, htmlSelector)
     {
         PropertyGetter = propertyGetter;
     }

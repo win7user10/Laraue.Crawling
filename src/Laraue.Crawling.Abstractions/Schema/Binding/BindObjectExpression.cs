@@ -1,6 +1,4 @@
-﻿using Laraue.Crawling.Abstractions.Schema.Delegates;
-
-namespace Laraue.Crawling.Abstractions.Schema.Binding;
+﻿namespace Laraue.Crawling.Abstractions.Schema.Binding;
 
 public class BindObjectExpression<TElement> : BindExpression<TElement>
 {
@@ -11,10 +9,10 @@ public class BindObjectExpression<TElement> : BindExpression<TElement>
 
     public BindObjectExpression(
         Type objectType,
-        SetPropertyDelegate? propertySetter,
+        SetPropertyInfo? setPropertyInfo,
         HtmlSelector? htmlSelector,
         SchemaExpression<TElement>[] childPropertiesBinders)
-        : base(objectType, propertySetter, htmlSelector)
+        : base(objectType, setPropertyInfo, htmlSelector)
     {
         ChildPropertiesBinders = childPropertiesBinders;
     }

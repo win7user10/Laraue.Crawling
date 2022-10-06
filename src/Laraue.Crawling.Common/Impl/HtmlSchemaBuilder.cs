@@ -25,7 +25,9 @@ public class HtmlSchemaBuilder<TElement, TModel>
         
         var bindingExpression = new BindValueExpression<TElement>(
             typeof(TValue),
-            (target, value) => property.SetValue(target, value, null),
+            new SetPropertyInfo(
+                (target, value) => property.SetValue(target, value, null),
+                property),
             htmlSelector,
             async element => await mapFunction.Invoke(element));
         
@@ -43,11 +45,15 @@ public class HtmlSchemaBuilder<TElement, TModel>
         
         var internalSchema = GetInternalSchema(
             childBuilder,
-            (target, value) => property.SetValue(target, value, null));
+            new SetPropertyInfo(
+                (target, value) => property.SetValue(target, value, null),
+                property));
         
         var bindingExpression = new BindObjectExpression<TElement>(
             typeof(TValue),
-            (target, value) => property.SetValue(target, value, null),
+            new SetPropertyInfo(
+                (target, value) => property.SetValue(target, value, null),
+                property),
             htmlSelector,
             internalSchema.ChildPropertiesBinders);
         
@@ -65,11 +71,15 @@ public class HtmlSchemaBuilder<TElement, TModel>
         
         var bindingExpression = new BindArrayExpression<TElement>(
             typeof(TValue),
-            (target, value) => property.SetValue(target, value, null),
+            new SetPropertyInfo(
+                (target, value) => property.SetValue(target, value, null),
+                property),
             htmlSelector,
             new BindValueExpression<TElement>(
                 typeof(TValue),
-                (target, value) => property.SetValue(target, value, null),
+                new SetPropertyInfo(
+                    (target, value) => property.SetValue(target, value, null),
+                    property),
                 null,
                 async element => await mapFunction.Invoke(element)));
         
@@ -89,7 +99,9 @@ public class HtmlSchemaBuilder<TElement, TModel>
         
         var bindingExpression = new BindArrayExpression<TElement>(
             typeof(TValue),
-            (target, value) => property.SetValue(target, value, null),
+            new SetPropertyInfo(
+                (target, value) => property.SetValue(target, value, null),
+                property),
             htmlSelector,
             internalSchema);
         
@@ -100,7 +112,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
     
     private BindObjectExpression<TElement> GetInternalSchema<TValue>(
         Action<HtmlSchemaBuilder<TElement, TValue>> childBuilder,
-        SetPropertyDelegate? propertySetter = null)
+        SetPropertyInfo? setPropertyInfo = null)
     {
         var internalSchemaBuilder = new HtmlSchemaBuilder<TElement, TValue>();
         
@@ -108,7 +120,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
 
         return new BindObjectExpression<TElement>(
             typeof(TValue),
-            propertySetter,
+            setPropertyInfo,
             null,
             internalSchemaBuilder.BindingExpressions.ToArray());
     }

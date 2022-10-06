@@ -1,6 +1,4 @@
-﻿using Laraue.Crawling.Abstractions.Schema.Delegates;
-
-namespace Laraue.Crawling.Abstractions.Schema.Binding;
+﻿namespace Laraue.Crawling.Abstractions.Schema.Binding;
 
 /// <summary>
 /// Represents an expression for bind value to the property of the specified type.
@@ -16,7 +14,7 @@ public abstract class BindExpression<TElement> : SchemaExpression<TElement>
     /// <summary>
     /// The delegate is used to bind properties of the object.
     /// </summary>
-    public SetPropertyDelegate? PropertySetter { get; }
+    public SetPropertyInfo? SetPropertyInfo { get; }
     
     /// <summary>
     /// If html selector is set, then it will be applied to the current element
@@ -24,10 +22,10 @@ public abstract class BindExpression<TElement> : SchemaExpression<TElement>
     /// </summary>
     public HtmlSelector? HtmlSelector { get; }
     
-    protected BindExpression(Type objectType, SetPropertyDelegate? propertySetter, HtmlSelector? htmlSelector)
+    protected BindExpression(Type objectType, SetPropertyInfo? setPropertyInfo, HtmlSelector? htmlSelector)
     {
         ObjectType = objectType;
-        PropertySetter = propertySetter;
+        SetPropertyInfo = setPropertyInfo;
         HtmlSelector = htmlSelector;
     }
 }

@@ -19,7 +19,7 @@ public static class AngleSharpSchemaBuilderExtensions
     /// <returns></returns>
     public static HtmlSchemaBuilder<IElement, TModel> HasProperty<TModel, TValue>(
         this HtmlSchemaBuilder<IElement, TModel> schemaBuilder,
-        Expression<Func<TModel, TValue>> schemaProperty,
+        Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector htmlSelector)
     {
         return schemaBuilder.HasProperty(
