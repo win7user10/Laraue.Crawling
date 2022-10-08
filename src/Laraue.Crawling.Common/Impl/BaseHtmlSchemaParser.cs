@@ -173,7 +173,7 @@ public abstract class BaseHtmlSchemaParser<TElement>
         
         _logger.LogTrace("Bind Property: {Path} Value: {Value}", currentContext, value);
         
-        bindExpression.SetPropertyInfo?.SetPropertyDelegate.Invoke(objectInstance, value);
+        bindExpression.SetPropertyInfo?.PropertyInfo.SetValue(objectInstance, value);
     }
     
     private Task ProcessActionExpressionAsync(

@@ -26,12 +26,21 @@ public class Helper
     /// <exception cref="NotImplementedException"></exception>
     public static PropertyInfo GetParsingProperty(LambdaExpression schemaProperty)
     {
-        if (schemaProperty.Body is not MemberExpression memberSelectorExpression)
+        var propertyExpression = schemaProperty.Body as MemberExpression;
+        if (propertyExpression is null)
         {
-            throw new NotImplementedException();
+            if (schemaProperty.Body is UnaryExpression unaryExpression)
+            {
+                propertyExpression = unaryExpression.Operand as MemberExpression;
+            }
         }
-        
-        var property = memberSelectorExpression.Member as PropertyInfo;
+
+        if (propertyExpression is null)
+        {
+            throw new InvalidOperationException($"Expression {schemaProperty} is not supported.");
+        }
+
+        var property = propertyExpression.Member as PropertyInfo;
         return property ?? throw new NotImplementedException();
     }
 }

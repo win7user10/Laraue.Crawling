@@ -25,9 +25,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
         
         var bindingExpression = new BindValueExpression<TElement>(
             typeof(TValue),
-            new SetPropertyInfo(
-                (target, value) => property.SetValue(target, value, null),
-                property),
+            new SetPropertyInfo(property),
             htmlSelector,
             async element => await mapFunction.Invoke(element));
         
@@ -45,15 +43,11 @@ public class HtmlSchemaBuilder<TElement, TModel>
         
         var internalSchema = GetInternalSchema(
             childBuilder,
-            new SetPropertyInfo(
-                (target, value) => property.SetValue(target, value, null),
-                property));
+            new SetPropertyInfo(property));
         
         var bindingExpression = new BindObjectExpression<TElement>(
             typeof(TValue),
-            new SetPropertyInfo(
-                (target, value) => property.SetValue(target, value, null),
-                property),
+            new SetPropertyInfo(property),
             htmlSelector,
             internalSchema.ChildPropertiesBinders);
         
@@ -71,15 +65,11 @@ public class HtmlSchemaBuilder<TElement, TModel>
         
         var bindingExpression = new BindArrayExpression<TElement>(
             typeof(TValue),
-            new SetPropertyInfo(
-                (target, value) => property.SetValue(target, value, null),
-                property),
+            new SetPropertyInfo(property),
             htmlSelector,
             new BindValueExpression<TElement>(
                 typeof(TValue),
-                new SetPropertyInfo(
-                    (target, value) => property.SetValue(target, value, null),
-                    property),
+                new SetPropertyInfo(property),
                 null,
                 async element => await mapFunction.Invoke(element)));
         
@@ -99,9 +89,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
         
         var bindingExpression = new BindArrayExpression<TElement>(
             typeof(TValue),
-            new SetPropertyInfo(
-                (target, value) => property.SetValue(target, value, null),
-                property),
+            new SetPropertyInfo(property),
             htmlSelector,
             internalSchema);
         
