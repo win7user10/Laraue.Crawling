@@ -19,7 +19,7 @@ public abstract class BaseCrawler<TModel, TLink, TState> : ICrawler<TModel>
     {
         CrawlingState = await GetInitialStateAsync();
         
-        _logger.LogDebug("State has been loaded. State: {State}", CrawlingState);
+        _logger.LogInformation("State has been loaded. State: {State}", CrawlingState);
 
         var links = GetLinksWithLogging(GetLinks());
         
@@ -38,13 +38,13 @@ public abstract class BaseCrawler<TModel, TLink, TState> : ICrawler<TModel>
 
             pageStopwatch.Start();
             
-            _logger.LogDebug("Page {Page} processing started", page);
+            _logger.LogInformation("Page {Page} processing started", page);
 
             yield return page;
             
             pageStopwatch.Stop();
             
-            _logger.LogDebug(
+            _logger.LogInformation(
                 "Page {Page} processing finished for {Time}",
                 page,
                 pageStopwatch.Elapsed);

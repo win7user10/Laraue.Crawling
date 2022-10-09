@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Text.Json;
 using Laraue.Crawling.Abstractions;
 using Laraue.Crawling.Common.Impl;
 using PuppeteerSharp;
@@ -23,27 +24,29 @@ public static class PuppeterSharpSchemaBuilderExtensions
         });
     }
     
-    public static HtmlSchemaBuilder<ElementHandle, TModel> HasProperty<TModel>(
-        this HtmlSchemaBuilder<ElementHandle, TModel> schema,
-        Expression<Func<TModel, int>> schemaProperty,
-        HtmlSelector htmlSelector)
+    public static HtmlSchemaBuilder<ElementHandle, TModel> HasProperty<TModel, TValue>(
+        this HtmlSchemaBuilder<ElementHandle, TModel> schemaBuilder,
+        Expression<Func<TModel, TValue?>> schemaProperty,
+        HtmlSelector htmlSelector,
+        Func<string, string>? modifyFunc = null)
     {
-        return schema.HasProperty(schemaProperty, htmlSelector, element =>
-        {
-            if (element is null)
+        return schemaBuilder.HasProperty<TValue>(
+            schemaProperty,
+            htmlSelector,
+            async element =>
             {
-                throw new Exception($"Handle {schemaProperty} error. The element is null.");
-            }
-            
-            return element.GetIntAsync();
-        });
-    }
-    
-    public static HtmlSchemaBuilder<ElementHandle, TModel> HasProperty<TModel>(
-        this HtmlSchemaBuilder<ElementHandle, TModel> schema,
-        Expression<Func<TModel, decimal>> schemaProperty,
-        HtmlSelector htmlSelector)
-    {
-        return schema.HasProperty(schemaProperty, htmlSelector, element => element.GetDecimalAsync());
+                var textContent = await element.GetInnerTextAsync();
+
+                if (modifyFunc is not null)
+                {
+                    textContent = modifyFunc(textContent);
+                }
+                
+                var value = typeof(TValue) == typeof(string)
+                    ? (dynamic) textContent
+                    : JsonSerializer.Deserialize<TValue>(textContent);
+
+                return value;
+            });
     }
 }

@@ -15,7 +15,7 @@ public class AngleSharpParserTests
     {
         var schema = new AngleSharpSchemaBuilder<OnePage>()
             .HasProperty(x => x.Title, ".title")
-            .HasProperty(x => x.User, ".user", userBuilder =>
+            .HasObjectProperty(x => x.User, ".user", userBuilder =>
             {
                 userBuilder.HasProperty(x => x.Name, ".name")
                     .HasProperty(x => x.Age, ".age")

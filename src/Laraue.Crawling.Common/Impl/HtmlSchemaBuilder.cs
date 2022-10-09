@@ -34,7 +34,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
         return this;
     }
 
-    public HtmlSchemaBuilder<TElement, TModel> HasProperty<TValue>(
+    public HtmlSchemaBuilder<TElement, TModel> HasObjectProperty<TValue>(
         Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector htmlSelector,
         Action<HtmlSchemaBuilder<TElement, TValue>> childBuilder)

@@ -15,7 +15,29 @@ public static class RetrieveExtensions
     /// <returns></returns>
     public static int GetIntOrDefault(this string? str)
     {
-        return str.GetNumberOrDefault<int>(s => NonDigitCharsRegex.Replace(s, string.Empty));
+        return str.GetNumberOrDefault<int>(GetOnlyDigits);
+    }
+    
+    /// <summary>
+    /// Get only integers from string and parse them.
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
+    public static long GetLongOrDefault(this string? str)
+    {
+        return str.GetNumberOrDefault<long>(GetOnlyDigits);
+    }
+
+    /// <summary>
+    /// Get only digits from the string.
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
+    public static string GetOnlyDigits(this string? str)
+    {
+        return str is not null
+            ? NonDigitCharsRegex.Replace(str, string.Empty)
+            : string.Empty;
     }
     
     /// <summary>
