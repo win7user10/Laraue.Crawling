@@ -31,7 +31,7 @@ jobs:
           for p in $(find ./src -name *.csproj); do dotnet build $p --configuration Release; done
 
       - name: Generate a NuGet package
-        run: dotnet pack -p:TargetFrameworks=${{env.PROJECT_TARGET}} -p:PackageVersion=${{env.RELEASE_VERSION}} --no-build -c Release -o .
+        run: dotnet pack -p:PackageVersion=${{env.RELEASE_VERSION}} --no-build -c Release -o .
 
       - name: Push to GitHub package registry
         run: dotnet nuget push "*.nupkg" -k ${{secrets.NUGETORGTOKEN}} -s https://api.nuget.org/v3/index.json --skip-duplicate 
