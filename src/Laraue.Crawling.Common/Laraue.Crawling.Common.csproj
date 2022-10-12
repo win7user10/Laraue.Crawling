@@ -2,8 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <Description>Common Laraue.Crawling classes.</Description>
+    <RepositoryType>git</RepositoryType>
+    <Authors>Belyanskiy Ilya</Authors>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
