@@ -65,5 +65,5 @@ public record OnePage
     public User User { get; init; }
 }
 
-public record User(string Name, int Age, Dog[] Dogs, IDictionary<string, int> DogAge);
+public record User(string Name, int Age, Dog[] Dogs);
 public record Dog(string Name, int Age);

@@ -4,39 +4,72 @@ The set of tools for fast writing crawlers on .NET.
 
 ### Static crawling
 
-Static means the crawling process is performing in the html which is not changes.
-You can build a strongly typed schema where for each property defines it mapping to
-html by using html selectors. Then this schema can be parsed via IStaticHtmlSchemaParser class.
-Use default implementation AngleSharpHtmlParser to retrieve all data.
+Static means the crawling process is performing with the static html that not changes.
+You can build a strongly typed schema with binding binding each element to related html block.
+Then this schema can be parsed via AngleSharpParser class located in Laraue.Crawling.Static.AngleSharp library.
 
 #### Build static schema
 
-```cs
-record User(string Name, int Age, Dog[] Dogs);
-record Dog(string Name, int Age);
+```html
+<div>
+    <div class="title">Private info</div>
+    <div class="user">
+        <div class="name">Alex</div>
+        <div class="age">10</div>
+        <div class="dogs">
+            <div class="dog">
+                <div class="name">Jelly</div>
+                <div class="age">5</div>
+            </div>
+            <div class="dog">
+                <div class="name">Marly</div>
+                <div class="age">7</div>
+            </div>
+        </div>
+    </div>
+    <div class="links">
+        <a href="https://hey1.html"></a>
+        <a href="https://hey2.html"></a>
+    </div>
+</div>
+```
 
-var schema = new HtmlSchemaBuilder<User>()
-    .HasProperty(x => x.Name, ".name")
-    .HasProperty(x => x.Age, ".age")
-    .HasArrayProperty(x => x.Dogs, ".dog", dogsBuilder =>
+```csharp
+public record OnePage(string Title, string[] ImageLinks, User User);
+public record User(string Name, int Age, Dog[] Dogs);
+public record Dog(string Name, int Age);
+
+
+ var schema = new AngleSharpSchemaBuilder<OnePage>()
+    .HasProperty(x => x.Title, ".title")
+    .HasObjectProperty(x => x.User, ".user", userBuilder =>
     {
-        dogsBuilder.HasProperty(x => x.Age, ".age")
-            .HasProperty(x => x.Name, ".name");
-    });
+        userBuilder.HasProperty(x => x.Name, ".name")
+            .HasProperty(x => x.Age, ".age")
+            .HasArrayProperty(x => x.Dogs, ".dog", dogsBuilder =>
+            {
+                dogsBuilder.HasProperty(x => x.Age, ".age")
+                    .HasProperty(x => x.Name, ".name");
+            });
+    })
+    .HasArrayProperty(
+        x => x.ImageLinks,
+        ".links a",
+        x => Task.FromResult(x.GetAttributeValue("href")))
     .Build();
 ```
 
 #### Using of the static schema for parsing of the passed html
 
-```cs
-var htmlParser = new HtmlParser();
-var visitor = new AngleSharpParser(htmlParser);
+```csharp
+var parser = new AngleSharpParser(new NullLoggerFactory());
 
-var html = File.ReadAllText("test.html");
-var model = visitor.Parse(schema, html);
+var html = await File.ReadAllTextAsync("test.html");
+var model = await parser.RunAsync(schema, html);
 
-Assert.Equal("Alex", model.Name);
-Assert.Equal(10, model.Age);
+Assert.Equal("Private info", model.Title);
+Assert.Equal("Alex", model.User.Name);
+Assert.Equal(10, model.User.Age);
 
 var dogs = model.User.Dogs;
 Assert.Equal(2, dogs.Length);
@@ -48,8 +81,76 @@ Assert.Equal("Jelly", dog1.Name);
 var dog2 = dogs[1];
 Assert.Equal(7, dog2.Age);
 Assert.Equal("Marly", dog2.Name);
+
+var links = model.ImageLinks;
+Assert.Equal(2, links.Length);
+Assert.Equal("https://hey1.html", links[0]);
+Assert.Equal("https://hey2.html", links[1]);
 ```
 
 ### Dynamic crawling
 
-This section is not ready
+The package Laraue.Crawling.Dynamic.PuppeterSharp intended to parse schemas using PuppeterSharp library.
+Let's rewrite static schema to the dynamic format:
+
+```csharp
+public record OnePage(string Title, string[] ImageLinks, User User);
+public record User(string Name, int Age, Dog[] Dogs);
+public record Dog(string Name, int Age);
+
+
+var schema = new PuppeterSharpSchemaBuilder<OnePage>()
+    .HasProperty(x => x.Title, ".title")
+    .HasObjectProperty(x => x.User, ".user", userBuilder =>
+    {
+        userBuilder.HasProperty(x => x.Name, ".name")
+            .HasProperty(x => x.Age, ".age")
+            .HasArrayProperty(x => x.Dogs, ".dog", dogsBuilder =>
+            {
+                dogsBuilder.HasProperty(x => x.Age, ".age")
+                    .HasProperty(x => x.Name, ".name");
+            });
+    })
+    .HasArrayProperty(
+        x => x.ImageLinks,
+        ".links a",
+        async handle => await handle.GetAttributeValueAsync("href"))
+    .Build();
+```
+
+The main difference that all functions now interacts with ElementHandle class from PuppeterSharp library.
+The crawling can be executed this way:
+
+```csharp
+await new BrowserFetcher().DownloadAsync();
+await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions());
+var page = await browser.NewPageAsync();
+var response = await page.GoToAsync(link);
+var model = await _parser.RunAsync(schema, await page.QuerySelectorAsync("body"));
+```
+
+### Extended features
+
+Sometimes binding of html element to property is not enough. For example - one string should
+be divided into three elements.
+
+```html
+<p class="info">
+    Bob Martin 37
+</p>
+```
+
+```csharp
+record User(string Name, string Surname, int Age);
+var schema = new PuppeterSharpSchemaBuilder<User>()
+    .BindManually(async (element, modelBinder) => {
+        var element = await element.QuerySelectorAsync(".info");
+        if (element is null) return;
+        var elementText = await element.GetInnerTextAsync();
+        var stringParts = elementText.Split(' ');
+        if (stringParts.Length != 3) return;
+        modelBinder.BindProperty(x => x.Name, stringParts[0]);
+        modelBinder.BindProperty(x => x.Surname, stringParts[1]);
+        modelBinder.BindProperty(x => x.Age, int.Parse(stringParts[2]));
+    })
+```
