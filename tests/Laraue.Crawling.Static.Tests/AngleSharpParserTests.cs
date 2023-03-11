@@ -22,7 +22,16 @@ public class AngleSharpParserTests
                     .HasArrayProperty(x => x.Dogs, ".dog", dogsBuilder =>
                     {
                         dogsBuilder.HasProperty(x => x.Age, ".age")
-                            .HasProperty(x => x.Name, ".name");
+                            .HasProperty(x => x.Name, ".name")
+                            .BindManually((element, binder) =>
+                            {
+                                var age = binder.GetProperty(x => x.Age);
+                                var name = binder.GetProperty(x => x.Name);
+                                
+                                binder.BindProperty(x => x.Identifier, $"{name}_{age}");
+                                
+                                return Task.CompletedTask;
+                            });
                     });
             })
             .HasArrayProperty(
@@ -46,10 +55,12 @@ public class AngleSharpParserTests
         var dog1 = dogs[0];
         Assert.Equal(5, dog1.Age);
         Assert.Equal("Jelly", dog1.Name);
+        Assert.Equal("Jelly_5", dog1.Identifier);
         
         var dog2 = dogs[1];
         Assert.Equal(7, dog2.Age);
         Assert.Equal("Marly", dog2.Name);
+        Assert.Equal("Marly_7", dog2.Identifier);
 
         var links = model.ImageLinks;
         Assert.Equal(2, links.Length);
@@ -66,4 +77,4 @@ public record OnePage
 }
 
 public record User(string Name, int Age, Dog[] Dogs);
-public record Dog(string Name, int Age);
+public record Dog(string Name, int Age, string Identifier);

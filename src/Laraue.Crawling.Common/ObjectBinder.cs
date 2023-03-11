@@ -6,8 +6,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Laraue.Crawling.Common;
 
-public class ObjectBinder<T> : ObjectBinder, IObjectBinder<T>
+public sealed class ObjectBinder<T> : ObjectBinder, IObjectBinder<T>
 {
+    private T Instance => (T)_instance!;
+    
     public ObjectBinder(T instance, ILoggerFactory loggerFactory, VisitorContext visitorContext)
         : base(instance, loggerFactory.CreateLogger<ObjectBinder<T>>(), visitorContext)
     {
@@ -17,11 +19,16 @@ public class ObjectBinder<T> : ObjectBinder, IObjectBinder<T>
     {
         BindProperty((LambdaExpression)selector, value);
     }
+
+    public TProperty GetProperty<TProperty>(Func<T, TProperty> selector)
+    {
+        return selector(Instance);
+    }
 }
 
 public class ObjectBinder : IObjectBinder
 {
-    private readonly object? _instance;
+    protected readonly object? _instance;
     private readonly ILogger<ObjectBinder> _logger;
     private readonly VisitorContext _visitorContext;
 

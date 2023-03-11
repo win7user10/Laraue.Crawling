@@ -15,6 +15,14 @@ public interface IObjectBinder<T>
     /// <param name="value"></param>
     /// <typeparam name="TProperty"></typeparam>
     public void BindProperty<TProperty>(Expression<Func<T, TProperty?>> selector, TProperty? value);
+    
+    /// <summary>
+    /// Gets the current value of the model using the specified selector.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <typeparam name="TProperty"></typeparam>
+    /// <returns></returns>
+    public TProperty GetProperty<TProperty>(Func<T, TProperty> selector);
 }
 
 public interface IObjectBinder
