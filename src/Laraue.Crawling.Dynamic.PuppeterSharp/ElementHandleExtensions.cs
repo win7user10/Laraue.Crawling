@@ -13,7 +13,7 @@ public static class ElementHandleExtensions
     /// </summary>
     /// <param name="elementHandle"></param>
     /// <returns></returns>
-    public static Task<string?> GetInnerTextAsync(this ElementHandle? elementHandle)
+    public static Task<string?> GetInnerTextAsync(this IElementHandle? elementHandle)
     {
         return elementHandle is null
             ? Task.FromResult<string?>(null)
@@ -25,7 +25,7 @@ public static class ElementHandleExtensions
     /// </summary>
     /// <param name="elementHandle"></param>
     /// <returns></returns>
-    public static Task<string[]> GetClassesAsync(this ElementHandle? elementHandle)
+    public static Task<string[]> GetClassesAsync(this IElementHandle? elementHandle)
     {
         return elementHandle is null
             ? Task.FromResult(Array.Empty<string>())
@@ -38,7 +38,7 @@ public static class ElementHandleExtensions
     /// <param name="elementHandle"></param>
     /// <param name="className"></param>
     /// <returns></returns>
-    public static async Task<bool> HasClassAsync(this ElementHandle? elementHandle, string className)
+    public static async Task<bool> HasClassAsync(this IElementHandle? elementHandle, string className)
     {
         var classes = await elementHandle.GetClassesAsync();
 
@@ -51,7 +51,7 @@ public static class ElementHandleExtensions
     /// <param name="elementHandle"></param>
     /// <param name="attributeName"></param>
     /// <returns></returns>
-    public static Task<string?> GetAttributeValueAsync(this ElementHandle? elementHandle, string attributeName)
+    public static Task<string?> GetAttributeValueAsync(this IElementHandle? elementHandle, string attributeName)
     {
         return  elementHandle is null
             ? Task.FromResult<string?>(null)
@@ -65,11 +65,11 @@ public static class ElementHandleExtensions
     /// <param name="selector"></param>
     /// <param name="index"></param>
     /// <returns></returns>
-    public static async Task<ElementHandle?> QuerySelectorByIndexAsync(this ElementHandle elementHandle, string selector, int index)
+    public static async Task<IElementHandle?> QuerySelectorByIndexAsync(this IElementHandle elementHandle, string selector, int index)
     {
         var handle = await elementHandle.EvaluateFunctionHandleAsync($"e => e.querySelectorAll('{selector}')[{index}]").ConfigureAwait(false);
         
-        if (handle is ElementHandle element)
+        if (handle is IElementHandle element)
         {
             return element;
         }
@@ -84,7 +84,7 @@ public static class ElementHandleExtensions
     /// <param name="elementHandle"></param>
     /// <param name="selector"></param>
     /// <returns></returns>
-    public static Task<int> GetElementsCountAsync(this ElementHandle? elementHandle, string selector)
+    public static Task<int> GetElementsCountAsync(this IElementHandle? elementHandle, string selector)
     {
         return elementHandle is null
             ? Task.FromResult(0)
@@ -96,7 +96,7 @@ public static class ElementHandleExtensions
     /// </summary>
     /// <param name="elementHandle"></param>
     /// <returns></returns>
-    public static Task<string?> GetTrimmedInnerTextAsync(this ElementHandle? elementHandle)
+    public static Task<string?> GetTrimmedInnerTextAsync(this IElementHandle? elementHandle)
     {
         return GetInnerTextAsync(elementHandle).AwaitAndModify(s => s?.Trim());
     }
@@ -106,7 +106,7 @@ public static class ElementHandleExtensions
     /// </summary>
     /// <param name="elementHandle"></param>
     /// <returns></returns>
-    public static Task<int> GetIntAsync(this ElementHandle? elementHandle)
+    public static Task<int> GetIntAsync(this IElementHandle? elementHandle)
     {
         return GetInnerTextAsync(elementHandle).AwaitAndModify(RetrieveExtensions.GetIntOrDefault);
     }
@@ -116,7 +116,7 @@ public static class ElementHandleExtensions
     /// </summary>
     /// <param name="elementHandle"></param>
     /// <returns></returns>
-    public static Task<decimal> GetDecimalAsync(this ElementHandle elementHandle)
+    public static Task<decimal> GetDecimalAsync(this IElementHandle elementHandle)
     {
         return GetInnerTextAsync(elementHandle).AwaitAndModify(RetrieveExtensions.GetDecimalOrDefault);
     }

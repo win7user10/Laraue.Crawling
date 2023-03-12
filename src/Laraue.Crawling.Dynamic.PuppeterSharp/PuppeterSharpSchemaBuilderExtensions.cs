@@ -8,8 +8,8 @@ namespace Laraue.Crawling.Dynamic.PuppeterSharp;
 
 public static class PuppeterSharpSchemaBuilderExtensions
 {
-    public static HtmlSchemaBuilder<ElementHandle, TModel> HasProperty<TModel>(
-        this HtmlSchemaBuilder<ElementHandle, TModel> schema,
+    public static HtmlSchemaBuilder<IElementHandle, TModel> HasProperty<TModel>(
+        this HtmlSchemaBuilder<IElementHandle, TModel> schema,
         Expression<Func<TModel, string?>> schemaProperty,
         HtmlSelector htmlSelector)
     {
@@ -24,8 +24,8 @@ public static class PuppeterSharpSchemaBuilderExtensions
         });
     }
     
-    public static HtmlSchemaBuilder<ElementHandle, TModel> HasProperty<TModel, TValue>(
-        this HtmlSchemaBuilder<ElementHandle, TModel> schemaBuilder,
+    public static HtmlSchemaBuilder<IElementHandle, TModel> HasProperty<TModel, TValue>(
+        this HtmlSchemaBuilder<IElementHandle, TModel> schemaBuilder,
         Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector htmlSelector,
         Func<string, string>? modifyFunc = null)

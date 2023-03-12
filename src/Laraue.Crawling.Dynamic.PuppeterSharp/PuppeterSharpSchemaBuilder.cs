@@ -3,6 +3,6 @@ using PuppeteerSharp;
 
 namespace Laraue.Crawling.Dynamic.PuppeterSharp;
 
-public class PuppeterSharpSchemaBuilder<TModel> : HtmlSchemaBuilder<ElementHandle, TModel>
+public class PuppeterSharpSchemaBuilder<TModel> : HtmlSchemaBuilder<IElementHandle, TModel>
 {
 }
