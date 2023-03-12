@@ -5,21 +5,31 @@ using PuppeteerSharp;
 
 namespace Laraue.Crawling.Dynamic.PuppeterSharp;
 
-public class PuppeterSharpParser : BaseHtmlSchemaParser<ElementHandle>
+/// <summary>
+/// The implementation of the crawler based on the <see href="https://github.com/hardkoded/puppeteer-sharp">PupeeterSharp</see> library.
+/// </summary>
+public class PuppeterSharpParser : BaseHtmlSchemaParser<IElementHandle>
 {
-    public PuppeterSharpParser(ILoggerFactory loggerFactory) : base(loggerFactory)
+    /// <summary>
+    /// Initializes a new instance of <see cref="PuppeterSharpParser"/>.
+    /// </summary>
+    /// <param name="loggerFactory"></param>
+    public PuppeterSharpParser(ILoggerFactory loggerFactory)
+        : base(loggerFactory)
     {
     }
     
-    protected override Task<ElementHandle?> GetElementAsync(
-        ElementHandle currentElement,
+    /// <inheritdoc />
+    protected override Task<IElementHandle?> GetElementAsync(
+        IElementHandle currentElement,
         HtmlSelector htmlSelector)
     {
         return currentElement.QuerySelectorAsync(htmlSelector.Selector);
     }
 
-    protected override Task<ElementHandle[]?> GetElementsAsync(
-        ElementHandle currentElement,
+    /// <inheritdoc />
+    protected override Task<IElementHandle[]?> GetElementsAsync(
+        IElementHandle currentElement,
         HtmlSelector htmlSelector)
     {
         return currentElement.QuerySelectorAllAsync(htmlSelector.Selector);
