@@ -6,11 +6,13 @@
 public interface IHtmlSchemaParser<TElement>
 {
     /// <summary>
-    /// Returns the model from the passed schema and html code.
+    /// Parse passed schema and return the result.
     /// </summary>
     /// <param name="schema"></param>
-    /// <param name="html"></param>
+    /// <param name="rootElement"></param>
     /// <typeparam name="TModel"></typeparam>
     /// <returns></returns>
-    public TModel? Parse<TModel>(ICompiledHtmlSchema<TElement, TModel> schema, string html);
+    public Task<TModel?> RunAsync<TModel>(
+        ICompiledHtmlSchema<TElement, TModel> schema,
+        TElement? rootElement);
 }

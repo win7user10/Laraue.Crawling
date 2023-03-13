@@ -6,24 +6,26 @@ using Microsoft.Extensions.Logging;
 
 namespace Laraue.Crawling.Common.Impl;
 
-public abstract class BaseHtmlSchemaParser<TElement>
+/// <summary>
+/// Base functionality to implement <see cref="IHtmlSchemaParser{TElement}"/>.
+/// </summary>
+/// <typeparam name="TElement"></typeparam>
+public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElement>
 {
     private readonly ILogger<BaseHtmlSchemaParser<TElement>> _logger;
     private readonly ILoggerFactory _loggerFactory;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="BaseHtmlSchemaParser{TElement}"/>.
+    /// </summary>
+    /// <param name="loggerFactory"></param>
     protected BaseHtmlSchemaParser(ILoggerFactory loggerFactory)
     {
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<BaseHtmlSchemaParser<TElement>>();
     }
 
-    /// <summary>
-    /// Parse passed schema and return the result.
-    /// </summary>
-    /// <param name="schema"></param>
-    /// <param name="rootElement"></param>
-    /// <typeparam name="TModel"></typeparam>
-    /// <returns></returns>
+    /// <inheritdoc />
     public async Task<TModel?> RunAsync<TModel>(
         ICompiledHtmlSchema<TElement, TModel> schema,
         TElement? rootElement)
@@ -135,7 +137,7 @@ public abstract class BaseHtmlSchemaParser<TElement>
         return objectInstance;
     }
 
-    protected virtual Task ProcessSchemaExpressionAsync(
+    private Task ProcessSchemaExpressionAsync(
         SchemaExpression<TElement> schemaExpression,
         TElement currentElement,
         IObjectBinder objectBinder,
