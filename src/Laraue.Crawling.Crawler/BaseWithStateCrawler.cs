@@ -12,6 +12,7 @@ namespace Laraue.Crawling.Crawler;
 /// <typeparam name="TState"></typeparam>
 public abstract class BaseWithStateCrawler<TModel, TLink, TState> : IWithStateCrawler<TModel, TState>
     where TModel : class
+    where TState : class, new()
 {
     private readonly ILogger<BaseWithStateCrawler<TModel, TLink, TState>> _logger;
 
@@ -65,21 +66,23 @@ public abstract class BaseWithStateCrawler<TModel, TLink, TState> : IWithStateCr
     public TState? CrawlingState { get; private set; }
 
     /// <summary>
-    /// Describes how to get a crawler state. 
+    /// Gets the state that has been stored for this crawler.
+    /// Note - the actual crawler state can be not stored in the storage and be different.
+    /// To sync it use <see cref="SaveStateAsync"/>. 
     /// </summary>
     /// <returns></returns>
-    protected abstract Task<TState> GetStateAsync();
+    protected abstract Task<TState> GetStateFromStorageAsync();
 
     /// <inheritdoc />
     public async Task InitializeAsync()
     {
-        CrawlingState = await GetStateAsync();
+        CrawlingState = await GetStateFromStorageAsync();
         
         _logger.LogInformation("State has been loaded. State: {State}", CrawlingState);
     }
 
     /// <summary>
-    /// Describes how to save current <see cref="CrawlingState"/> to the long-term storage.
+    /// Store current in memory <see cref="CrawlingState"/> to the long-term storage.
     /// </summary>
     /// <returns></returns>
     public abstract Task SaveStateAsync();
@@ -87,7 +90,7 @@ public abstract class BaseWithStateCrawler<TModel, TLink, TState> : IWithStateCr
     /// <inheritdoc />
     public Task ResetStateAsync()
     {
-        CrawlingState = default;
+        CrawlingState = new TState();
 
         return SaveStateAsync();
     }

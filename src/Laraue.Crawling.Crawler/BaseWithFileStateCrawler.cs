@@ -32,7 +32,7 @@ public abstract class BaseWithFileStateCrawler<TModel, TLink, TState> : BaseWith
     protected abstract string StateFilePath { get; }
 
     /// <inheritdoc />
-    protected override async Task<TState> GetStateAsync()
+    protected override async Task<TState> GetStateFromStorageAsync()
     {
         if (!File.Exists(StateFilePath))
         {
