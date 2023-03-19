@@ -26,10 +26,8 @@ public interface IWithStateCrawler<out TModel, out TState> : ICrawler<TModel>
     Task SaveStateAsync();
 
     /// <summary>
-    /// Reset state to the default.
+    /// Reset crawler state to the default and update it in the long term storage.
     /// </summary>
     /// <returns></returns>
     Task ResetStateAsync();
 }
-
-// TODO - next abstraction is paginable crawler

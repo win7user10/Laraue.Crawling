@@ -55,6 +55,10 @@ public abstract class BaseWithStateCrawler<TModel, TLink, TState> : IWithStateCr
                 "Page {Page} processing finished for {Time}",
                 page,
                 pageStopwatch.Elapsed);
+
+            await SaveStateAsync();
+            
+            _logger.LogInformation("Crawler state is updated to {State}", CrawlingState);
         }
         
         sessionStopwatch.Stop();
