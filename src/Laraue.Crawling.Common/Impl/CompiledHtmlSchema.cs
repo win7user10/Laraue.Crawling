@@ -32,6 +32,17 @@ public class CompiledHtmlSchema<TElement, TModel> : ICompiledHtmlSchema<TElement
     {
         BindingExpression = bindingExpression;
     }
+
+    /// <summary>
+    /// Covert schema to the BindObjectExpression.
+    /// </summary>
+    /// <param name="schema"></param>
+    /// <returns></returns>
+    public static implicit operator BindObjectExpression<TElement>(
+        CompiledHtmlSchema<TElement, TModel> schema)
+    {
+        return schema.BindingExpression;
+    }
     
     /// <summary>
     /// Root binding expression.

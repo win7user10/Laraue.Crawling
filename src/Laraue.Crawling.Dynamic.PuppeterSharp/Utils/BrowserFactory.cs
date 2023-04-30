@@ -24,11 +24,11 @@ public sealed class BrowserFactory : IBrowserFactory
     {
         try
         {
-            await _semaphore.WaitAsync();
+            await _semaphore.WaitAsync().ConfigureAwait(false);
 
             if (!_isInitialized)
             {
-                await new BrowserFetcher().DownloadAsync();
+                await new BrowserFetcher().DownloadAsync().ConfigureAwait(false);
 
                 _isInitialized = true;
             }
@@ -38,7 +38,7 @@ public sealed class BrowserFactory : IBrowserFactory
                 return _browserInstance;
             }
             
-            _browserInstance = await Puppeteer.LaunchAsync(_launchOptions);
+            _browserInstance = await Puppeteer.LaunchAsync(_launchOptions).ConfigureAwait(false);
 
             return _browserInstance;
         }

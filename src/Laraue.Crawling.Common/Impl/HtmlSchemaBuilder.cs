@@ -27,7 +27,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
             typeof(TValue),
             new SetPropertyInfo(property),
             htmlSelector,
-            async element => await mapFunction.Invoke(element));
+            async element => await mapFunction.Invoke(element).ConfigureAwait(false));
         
         BindingExpressions.Add(bindingExpression);
 
@@ -71,7 +71,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
                 typeof(TValue),
                 new SetPropertyInfo(property),
                 null,
-                async element => await mapFunction.Invoke(element)));
+                async element => await mapFunction.Invoke(element).ConfigureAwait(false)));
         
         BindingExpressions.Add(bindingExpression);
 

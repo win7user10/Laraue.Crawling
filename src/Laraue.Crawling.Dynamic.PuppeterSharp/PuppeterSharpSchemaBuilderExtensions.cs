@@ -13,14 +13,14 @@ public static class PuppeterSharpSchemaBuilderExtensions
         Expression<Func<TModel, string?>> schemaProperty,
         HtmlSelector htmlSelector)
     {
-        return schema.HasProperty(schemaProperty, htmlSelector, async element =>
+        return schema.HasProperty(schemaProperty, htmlSelector, element =>
         {
             if (element is null)
             {
                 throw new Exception($"Handle {schemaProperty} error. The element is null.");
             }
 
-            return await element.GetTrimmedInnerTextAsync();
+            return element.GetTrimmedInnerTextAsync();
         });
     }
     

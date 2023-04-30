@@ -29,7 +29,8 @@ public static class ElementHandleExtensions
     {
         return elementHandle is null
             ? Task.FromResult(Array.Empty<string>())
-            : elementHandle.EvaluateFunctionAsync<string>("e => e.className").AwaitAndModify(x => x.Split(" "));
+            : elementHandle.EvaluateFunctionAsync<string>("e => e.className")
+                .AwaitAndModify(x => x.Split(" "));
     }
     
     /// <summary>

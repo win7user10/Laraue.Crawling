@@ -35,7 +35,10 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
         
         _logger.LogTrace("Bind started");
         
-        var result = (TModel?) await ParseAsync((BindExpression<TElement>)schema.BindingExpression, rootElement, new VisitorContext())
+        var result = (TModel?) await ParseAsync(
+                (BindExpression<TElement>)schema.BindingExpression,
+                rootElement,
+                new VisitorContext())
             .ConfigureAwait(false);
         
         stopWatch.Stop();
@@ -131,7 +134,8 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
         
         foreach (var element in complexType.ChildPropertiesBinders)
         {
-            await ProcessSchemaExpressionAsync(element, document, objectBinder, objectInstance, context);
+            await ProcessSchemaExpressionAsync(element, document, objectBinder, objectInstance, context)
+                .ConfigureAwait(false);
         }
 
         return objectInstance;
