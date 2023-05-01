@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Laraue.Crawling.Abstractions;
 using Microsoft.Extensions.Logging;
 
@@ -28,18 +29,20 @@ public abstract class BaseWithStateCrawler<TModel, TLink, TState> : IWithStateCr
     /// <inheritdoc />
     public IAsyncEnumerable<TModel> RunAsync(CancellationToken cancellationToken = default)
     {
-        var links = GetLinksWithLogging(GetLinks());
+        var links = GetLinksWithLogging(GetLinks(cancellationToken), cancellationToken);
         
         _logger.LogDebug("Links enumerator has been received");
         
-        return ParsePages(links);
+        return ParsePages(links, cancellationToken);
     }
 
-    private async IAsyncEnumerable<TLink> GetLinksWithLogging(IAsyncEnumerable<TLink> source)
+    private async IAsyncEnumerable<TLink> GetLinksWithLogging(
+        IAsyncEnumerable<TLink> source,
+        [EnumeratorCancellation] CancellationToken ct)
     {
         var sessionStopwatch = new Stopwatch();
         
-        await foreach (var page in source)
+        await foreach (var page in source.WithCancellation(ct))
         {
             var pageStopwatch = new Stopwatch();
 
@@ -103,12 +106,15 @@ public abstract class BaseWithStateCrawler<TModel, TLink, TState> : IWithStateCr
     /// Get links to parse via a crawler.
     /// </summary>
     /// <returns></returns>
-    protected abstract IAsyncEnumerable<TLink> GetLinks();
+    protected abstract IAsyncEnumerable<TLink> GetLinks(CancellationToken ct = default);
     
     /// <summary>
     /// Describes how to parse data from the passed page links.
     /// </summary>
     /// <param name="links"></param>
+    /// <param name="ct"></param>
     /// <returns></returns>
-    protected abstract IAsyncEnumerable<TModel> ParsePages(IAsyncEnumerable<TLink> links);
+    protected abstract IAsyncEnumerable<TModel> ParsePages(
+        IAsyncEnumerable<TLink> links,
+        CancellationToken ct = default);
 }

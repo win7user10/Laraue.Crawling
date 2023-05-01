@@ -6,7 +6,8 @@ using PuppeteerSharp;
 namespace Laraue.Crawling.Dynamic.PuppeterSharp;
 
 /// <summary>
-/// The implementation of the crawler based on the <see href="https://github.com/hardkoded/puppeteer-sharp">PupeeterSharp</see> library.
+/// The implementation of the crawler based on the
+/// <see href="https://github.com/hardkoded/puppeteer-sharp">PupeeterSharp</see> library.
 /// </summary>
 public class PuppeterSharpParser : BaseHtmlSchemaParser<IElementHandle>
 {
