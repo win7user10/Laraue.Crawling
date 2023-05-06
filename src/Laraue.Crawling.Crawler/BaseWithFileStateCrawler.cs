@@ -32,7 +32,7 @@ public abstract class BaseWithFileStateCrawler<TModel, TLink, TState> : BaseWith
     protected abstract string StateFilePath { get; }
 
     /// <inheritdoc />
-    protected override async Task<TState> GetStateFromStorageAsync()
+    protected override async Task<TState> GetStateFromStorageAsync(CancellationToken cancellationToken = default)
     {
         if (!File.Exists(StateFilePath))
         {
@@ -43,15 +43,16 @@ public abstract class BaseWithFileStateCrawler<TModel, TLink, TState> : BaseWith
         
         await using var stream = File.OpenRead(StateFilePath);
 
-        return await JsonSerializer.DeserializeAsync<TState>(stream) ?? new TState();
+        return await JsonSerializer.DeserializeAsync<TState>(stream, cancellationToken: cancellationToken)
+            ?? new TState();
     }
 
     /// <inheritdoc />
-    public override async Task SaveStateAsync()
+    public override async Task SaveStateAsync(CancellationToken cancellationToken = default)
     {
         await using var stream = File.Open(StateFilePath, FileMode.Create);
 
-        await stream.WriteAsync(JsonSerializer.SerializeToUtf8Bytes(CrawlingState));
+        await stream.WriteAsync(JsonSerializer.SerializeToUtf8Bytes(CrawlingState), cancellationToken);
         
         _logger.LogDebug("State {State} has been saved", CrawlingState);
     }

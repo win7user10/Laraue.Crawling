@@ -17,17 +17,17 @@ public interface IWithStateCrawler<out TModel, out TState> : ICrawler<TModel>
     /// Load the initial state of the crawler.
     /// </summary>
     /// <returns></returns>
-    Task InitializeAsync();
+    Task InitializeAsync(CancellationToken cancellationToken = default);
     
     /// <summary>
     /// Save current crawler state.
     /// </summary>
     /// <returns></returns>
-    Task SaveStateAsync();
+    Task SaveStateAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Reset crawler state to the default and update it in the long term storage.
     /// </summary>
     /// <returns></returns>
-    Task ResetStateAsync();
+    Task ResetStateAsync(CancellationToken cancellationToken = default);
 }

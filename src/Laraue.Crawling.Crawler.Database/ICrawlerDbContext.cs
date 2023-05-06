@@ -11,4 +11,11 @@ public interface ICrawlerDbContext
     /// All crawlers states.
     /// </summary>
     public DbSet<CrawlerStateEntity> CrawlerState { get; init; }
+
+    /// <summary>
+    /// Save changes method.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

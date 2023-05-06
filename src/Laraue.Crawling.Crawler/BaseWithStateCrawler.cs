@@ -44,6 +44,8 @@ public abstract class BaseWithStateCrawler<TModel, TLink, TState> : IWithStateCr
         
         await foreach (var page in source.WithCancellation(ct))
         {
+            ct.ThrowIfCancellationRequested();
+            
             var pageStopwatch = new Stopwatch();
 
             pageStopwatch.Start();
@@ -59,7 +61,7 @@ public abstract class BaseWithStateCrawler<TModel, TLink, TState> : IWithStateCr
                 page,
                 pageStopwatch.Elapsed);
 
-            await SaveStateAsync();
+            await SaveStateAsync(ct);
             
             _logger.LogInformation("Crawler state is updated to {State}", CrawlingState);
         }
@@ -78,12 +80,12 @@ public abstract class BaseWithStateCrawler<TModel, TLink, TState> : IWithStateCr
     /// To sync it use <see cref="SaveStateAsync"/>. 
     /// </summary>
     /// <returns></returns>
-    protected abstract Task<TState> GetStateFromStorageAsync();
+    protected abstract Task<TState> GetStateFromStorageAsync(CancellationToken cancellationToken = default);
 
     /// <inheritdoc />
-    public async Task InitializeAsync()
+    public async Task InitializeAsync(CancellationToken cancellationToken)
     {
-        CrawlingState = await GetStateFromStorageAsync();
+        CrawlingState = await GetStateFromStorageAsync(cancellationToken);
         
         _logger.LogInformation("State has been loaded. State: {State}", CrawlingState);
     }
@@ -92,14 +94,14 @@ public abstract class BaseWithStateCrawler<TModel, TLink, TState> : IWithStateCr
     /// Store current in memory <see cref="CrawlingState"/> to the long-term storage.
     /// </summary>
     /// <returns></returns>
-    public abstract Task SaveStateAsync();
+    public abstract Task SaveStateAsync(CancellationToken cancellationToken = default);
     
     /// <inheritdoc />
-    public Task ResetStateAsync()
+    public Task ResetStateAsync(CancellationToken cancellationToken = default)
     {
         CrawlingState = new TState();
 
-        return SaveStateAsync();
+        return SaveStateAsync(cancellationToken);
     }
 
     /// <summary>
