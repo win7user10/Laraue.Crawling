@@ -47,4 +47,11 @@ public sealed class BrowserFactory : IBrowserFactory
             _semaphore.Release();
         }
     }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        _semaphore.Dispose();
+        _browserInstance?.Dispose();
+    }
 }
