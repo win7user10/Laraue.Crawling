@@ -64,7 +64,14 @@ public static class RetrieveExtensions
             : numberString.GetAs<T>();
     }
     
-    private static T? GetAs<T>(this string str)
+    /// <summary>
+    /// Try return string as the passed type using deserialization.
+    /// </summary>
+    /// <param name="str"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="JsonException"></exception>
+    public static T? GetAs<T>(this string str)
     {
         try
         {

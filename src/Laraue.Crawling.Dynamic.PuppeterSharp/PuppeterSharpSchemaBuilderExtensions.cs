@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Text.Json;
 using Laraue.Crawling.Abstractions;
+using Laraue.Crawling.Common.Extensions;
 using Laraue.Crawling.Common.Impl;
 using PuppeteerSharp;
 
@@ -36,6 +37,10 @@ public static class PuppeterSharpSchemaBuilderExtensions
             async element =>
             {
                 var textContent = await element.GetInnerTextAsync();
+                if (textContent is null)
+                {
+                    return default;
+                }
 
                 if (modifyFunc is not null)
                 {
@@ -44,7 +49,7 @@ public static class PuppeterSharpSchemaBuilderExtensions
                 
                 var value = typeof(TValue) == typeof(string)
                     ? (dynamic) textContent
-                    : JsonSerializer.Deserialize<TValue>(textContent);
+                    : textContent.GetAs<TValue>();
 
                 return value;
             });
