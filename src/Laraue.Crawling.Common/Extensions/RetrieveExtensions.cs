@@ -66,6 +66,13 @@ public static class RetrieveExtensions
     
     private static T? GetAs<T>(this string str)
     {
-        return JsonSerializer.Deserialize<T>(str);
+        try
+        {
+            return JsonSerializer.Deserialize<T>(str);
+        }
+        catch (JsonException e)
+        {
+            throw new JsonException($"Unable to parse {str} as {typeof(T)}", e);
+        }
     }
 }
