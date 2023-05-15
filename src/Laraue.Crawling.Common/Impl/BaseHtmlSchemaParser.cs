@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text.Json;
 using Laraue.Crawling.Abstractions;
 using Laraue.Crawling.Abstractions.Schema;
 using Laraue.Crawling.Abstractions.Schema.Binding;
@@ -218,7 +219,16 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
             return null;
         }
 
-        return await simpleType.PropertyGetter(documentToParse);
+        try
+        {
+            return await simpleType.PropertyGetter(documentToParse).ConfigureAwait(false);
+        }
+        catch (JsonException e)
+        {
+            throw new InvalidCastException(
+                $"Cannot parse path {context} for document {documentToParse}",
+                e);
+        }
     }
     
     private async Task<object?> ParseAsync(
