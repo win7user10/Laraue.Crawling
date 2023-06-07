@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Laraue.Crawling.Common\Laraue.Crawling.Common.csproj" />
-    <ProjectReference Include="..\Laraue.Crawling.Crawler\Laraue.Crawling.Crawler.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <Description>The set of classes to write a program for a data crawling.</Description>
     <RepositoryType>git</RepositoryType>
     <Authors>Belyanskiy Ilya</Authors>
@@ -12,7 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Laraue.Core.Extensions.Hosting" Version="7.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Laraue.Core.Extensions.Hosting.EfCore" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
