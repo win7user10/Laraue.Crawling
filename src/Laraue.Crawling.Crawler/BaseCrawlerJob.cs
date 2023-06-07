@@ -10,17 +10,17 @@ namespace Laraue.Crawling.Crawler;
 /// <typeparam name="TModel"></typeparam>
 /// <typeparam name="TLink"></typeparam>
 /// <typeparam name="TState"></typeparam>
-public abstract class BaseCrawlerService<TModel, TLink, TState> : ICrawlerService<TState>
+public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState>
     where TModel : class
     where TState : class, new()
 {
-    private readonly ILogger<BaseCrawlerService<TModel, TLink, TState>> _logger;
+    private readonly ILogger<BaseCrawlerJob<TModel, TLink, TState>> _logger;
 
     /// <summary>
-    /// Initializes a new instance of <see cref="BaseCrawlerService{TModel,TLink,TState}"/>.
+    /// Initializes a new instance of <see cref="BaseCrawlerJob{TModel,TLink,TState}"/>.
     /// </summary>
     /// <param name="logger"></param>
-    protected BaseCrawlerService(ILogger<BaseCrawlerService<TModel, TLink, TState>> logger)
+    protected BaseCrawlerJob(ILogger<BaseCrawlerJob<TModel, TLink, TState>> logger)
     {
         _logger = logger;
     }
@@ -51,7 +51,6 @@ public abstract class BaseCrawlerService<TModel, TLink, TState> : ICrawlerServic
             link,
             pageStopwatch.Elapsed);
         
-        // TODO - Should be opportunity to message job runner that state should be updated and next call be executed immediately
         return TimeSpan.Zero;
     }
 

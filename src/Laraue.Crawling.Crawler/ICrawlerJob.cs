@@ -7,7 +7,7 @@ namespace Laraue.Crawling.Crawler;
 /// The <see cref="ICrawler{TState}"/> that contains a state that can be stored somehow.
 /// </summary>
 /// <typeparam name="TState"></typeparam>
-public interface ICrawlerService<TState> : IJob<TState>
+public interface ICrawlerJob<TState> : IJob<TState>
     where TState : class, new()
 {
 }
