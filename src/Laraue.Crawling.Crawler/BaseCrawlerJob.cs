@@ -30,6 +30,8 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState
     {
         var sessionStopwatch = new Stopwatch();
         sessionStopwatch.Start();
+
+        await OnSessionStartAsync(jobState).ConfigureAwait(false);
         
         var pageStopwatch = new Stopwatch();
         pageStopwatch.Start();
@@ -38,6 +40,9 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState
         if (link == null)
         {
             _logger.LogInformation("Crawling session finished for {Time}", sessionStopwatch.Elapsed);
+
+            await OnSessionFinishAsync(jobState).ConfigureAwait(false);
+            
             return GetTimeToWait();
         }
             
@@ -83,4 +88,18 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState
     /// </summary>
     /// <returns></returns>
     protected abstract TimeSpan GetTimeToWait();
+
+    /// <summary>
+    /// Do something when crawling session finished.
+    /// </summary>
+    /// <param name="state"></param>
+    /// <returns></returns>
+    protected abstract Task OnSessionStartAsync(JobState<TState> state);
+
+    /// <summary>
+    /// Do something when crawling session started.
+    /// </summary>
+    /// <param name="state"></param>
+    /// <returns></returns>
+    protected abstract Task OnSessionFinishAsync(JobState<TState> state);
 }
