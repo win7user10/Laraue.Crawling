@@ -33,8 +33,8 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState
         
         var pageStopwatch = new Stopwatch();
         pageStopwatch.Start();
-            
-        var link = await GetNextLinkAsync(stoppingToken).ConfigureAwait(false);
+        
+        var link = await GetNextLinkAsync(jobState, stoppingToken).ConfigureAwait(false);
         if (link == null)
         {
             _logger.LogInformation("Crawling session finished for {Time}", sessionStopwatch.Elapsed);
@@ -57,9 +57,10 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState
     /// <summary>
     /// Return next link should be parsed or null to pause.
     /// </summary>
+    /// <param name="state"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected abstract Task<TLink?> GetNextLinkAsync(CancellationToken cancellationToken = default);
+    protected abstract Task<TLink?> GetNextLinkAsync(JobState<TState> state, CancellationToken cancellationToken = default);
     
     /// <summary>
     /// Execute something after one link has been parsed. Here 
