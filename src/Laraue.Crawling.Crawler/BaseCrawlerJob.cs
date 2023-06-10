@@ -25,38 +25,44 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : BaseJob<TState>
         _logger = logger;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// The crawling job body. Each method can raise <see cref="SessionInterruptedException"/>
+    /// to finish the session immediately.
+    /// </summary>
+    /// <param name="jobState"></param>
+    /// <param name="stoppingToken"></param>
+    /// <returns></returns>
     public override async Task<TimeSpan> ExecuteAsync(JobState<TState> jobState, CancellationToken stoppingToken)
     {
         await OnSessionStartAsync(jobState, stoppingToken).ConfigureAwait(false);
         
         var pageStopwatch = new Stopwatch();
-        pageStopwatch.Start();
 
         while (true)
         {
-            var link = await GetNextLinkAsync(jobState, stoppingToken).ConfigureAwait(false);
-            if (link == null)
+            pageStopwatch.Restart();
+
+            try
             {
-                return await RunSessionFinishAsync(jobState, stoppingToken).ConfigureAwait(false);
-            }
+                var link = await GetNextLinkAsync(jobState, stoppingToken).ConfigureAwait(false);
+                _logger.LogInformation("Page {Page} processing started", link);
             
-            _logger.LogInformation("Page {Page} processing started", link);
+                var result = await ParseLinkAsync(link, jobState, stoppingToken).ConfigureAwait(false);
+                await AfterLinkParsedAsync(link, result, jobState, stoppingToken).ConfigureAwait(false);
             
-            var result = await ParseLinkAsync(link, jobState, stoppingToken).ConfigureAwait(false);
-            if (result is null)
-            {
-                return await RunSessionFinishAsync(jobState, stoppingToken).ConfigureAwait(false);
-            }
-            
-            await AfterLinkParsedAsync(link, result, jobState, stoppingToken).ConfigureAwait(false);
-            
-            _logger.LogInformation(
-                "Page {Page} processing finished for {Time}",
-                link,
-                pageStopwatch.Elapsed);
+                _logger.LogInformation(
+                    "Page {Page} processing finished for {Time}",
+                    link,
+                    pageStopwatch.Elapsed);
         
-            stoppingToken.ThrowIfCancellationRequested();
+                stoppingToken.ThrowIfCancellationRequested();
+            }
+            catch (SessionInterruptedException e)
+            {
+                _logger.LogInformation("Session should be finished. Reason: {Message}", e.Message);
+                
+                return await RunSessionFinishAsync(jobState, stoppingToken);
+            }
         }
     }
 
@@ -68,12 +74,12 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : BaseJob<TState>
     }
 
     /// <summary>
-    /// Return next link should be parsed or null to pause.
+    /// Return the next link should be parsed.
     /// </summary>
     /// <param name="state"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected abstract Task<TLink?> GetNextLinkAsync(JobState<TState> state, CancellationToken cancellationToken = default);
+    protected abstract Task<TLink> GetNextLinkAsync(JobState<TState> state, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The body of parsing.
@@ -82,7 +88,7 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : BaseJob<TState>
     /// <param name="state"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected abstract Task<TModel?> ParseLinkAsync(TLink link, JobState<TState> state, CancellationToken cancellationToken = default);
+    protected abstract Task<TModel> ParseLinkAsync(TLink link, JobState<TState> state, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Return how long to wait before the next crawling session.
