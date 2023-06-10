@@ -10,14 +10,11 @@ namespace Laraue.Crawling.Crawler;
 /// <typeparam name="TModel"></typeparam>
 /// <typeparam name="TLink"></typeparam>
 /// <typeparam name="TState"></typeparam>
-public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState>
+public abstract class BaseCrawlerJob<TModel, TLink, TState> : BaseJob<TState>
     where TModel : class
     where TState : class, new()
 {
     private readonly ILogger<BaseCrawlerJob<TModel, TLink, TState>> _logger;
-    
-    /// <inheritdoc />
-    public event Func<JobState<TState>, CancellationToken, Task>? OnStateUpdated;
 
     /// <summary>
     /// Initializes a new instance of <see cref="BaseCrawlerJob{TModel,TLink,TState}"/>.
@@ -29,7 +26,7 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState
     }
 
     /// <inheritdoc />
-    public async Task<TimeSpan> ExecuteAsync(JobState<TState> jobState, CancellationToken stoppingToken)
+    public override async Task<TimeSpan> ExecuteAsync(JobState<TState> jobState, CancellationToken stoppingToken)
     {
         var sessionStopwatch = new Stopwatch();
         sessionStopwatch.Start();
@@ -53,8 +50,8 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState
             
             _logger.LogInformation("Page {Page} processing started", link);
             
-            await ParseLinkAsync(link, jobState.JobData, stoppingToken).ConfigureAwait(false);
-            await AfterLinkParsedAsync(link, jobState.JobData, stoppingToken).ConfigureAwait(false);
+            await ParseLinkAsync(link, jobState, stoppingToken).ConfigureAwait(false);
+            await AfterLinkParsedAsync(link, jobState, stoppingToken).ConfigureAwait(false);
             
             _logger.LogInformation(
                 "Page {Page} processing finished for {Time}",
@@ -80,7 +77,7 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState
     /// <param name="state"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected abstract Task<TModel?> ParseLinkAsync(TLink link, TState state, CancellationToken cancellationToken = default);
+    protected abstract Task<TModel?> ParseLinkAsync(TLink link, JobState<TState> state, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Return how long to wait before the next crawling session.
@@ -111,5 +108,5 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState
     /// <param name="state"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected abstract Task AfterLinkParsedAsync(TLink link, TState state, CancellationToken cancellationToken = default);
+    protected abstract Task AfterLinkParsedAsync(TLink link, JobState<TState> state, CancellationToken cancellationToken = default);
 }
