@@ -54,6 +54,7 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState
             _logger.LogInformation("Page {Page} processing started", link);
             
             await ParseLinkAsync(link, jobState.JobData, stoppingToken).ConfigureAwait(false);
+            await AfterLinkParsedAsync(link, jobState.JobData, stoppingToken).ConfigureAwait(false);
             
             _logger.LogInformation(
                 "Page {Page} processing finished for {Time}",
@@ -102,4 +103,13 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     protected abstract Task OnSessionFinishAsync(JobState<TState> state, CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// Execute something after one link has been parsed. 
+    /// </summary>
+    /// <param name="link"></param>
+    /// <param name="state"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    protected abstract Task AfterLinkParsedAsync(TLink link, TState state, CancellationToken cancellationToken = default);
 }
