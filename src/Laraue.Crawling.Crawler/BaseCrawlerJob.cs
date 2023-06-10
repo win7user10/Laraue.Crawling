@@ -15,6 +15,9 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState
     where TState : class, new()
 {
     private readonly ILogger<BaseCrawlerJob<TModel, TLink, TState>> _logger;
+    
+    /// <inheritdoc />
+    public event Func<JobState<TState>, CancellationToken, Task>? OnStateUpdated;
 
     /// <summary>
     /// Initializes a new instance of <see cref="BaseCrawlerJob{TModel,TLink,TState}"/>.
@@ -31,32 +34,34 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState
         var sessionStopwatch = new Stopwatch();
         sessionStopwatch.Start();
 
-        await OnSessionStartAsync(jobState).ConfigureAwait(false);
+        await OnSessionStartAsync(jobState, stoppingToken).ConfigureAwait(false);
         
         var pageStopwatch = new Stopwatch();
         pageStopwatch.Start();
-        
-        var link = await GetNextLinkAsync(jobState, stoppingToken).ConfigureAwait(false);
-        if (link == null)
-        {
-            _logger.LogInformation("Crawling session finished for {Time}", sessionStopwatch.Elapsed);
 
-            await OnSessionFinishAsync(jobState).ConfigureAwait(false);
+        while (true)
+        {
+            var link = await GetNextLinkAsync(jobState, stoppingToken).ConfigureAwait(false);
+            if (link == null)
+            {
+                _logger.LogInformation("Crawling session finished for {Time}", sessionStopwatch.Elapsed);
+
+                await OnSessionFinishAsync(jobState, stoppingToken).ConfigureAwait(false);
             
-            return GetTimeToWait();
-        }
+                return GetTimeToWait();
+            }
             
-        _logger.LogInformation("Page {Page} processing started", link);
+            _logger.LogInformation("Page {Page} processing started", link);
             
-        await ParseLinkAsync(link, stoppingToken).ConfigureAwait(false);
-        await UpdateStateAsync(jobState, stoppingToken).ConfigureAwait(false);
+            await ParseLinkAsync(link, jobState.JobData, stoppingToken).ConfigureAwait(false);
             
-        _logger.LogInformation(
-            "Page {Page} processing finished for {Time}",
-            link,
-            pageStopwatch.Elapsed);
+            _logger.LogInformation(
+                "Page {Page} processing finished for {Time}",
+                link,
+                pageStopwatch.Elapsed);
         
-        return TimeSpan.Zero;
+            stoppingToken.ThrowIfCancellationRequested();
+        }
     }
 
     /// <summary>
@@ -66,22 +71,15 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     protected abstract Task<TLink?> GetNextLinkAsync(JobState<TState> state, CancellationToken cancellationToken = default);
-    
-    /// <summary>
-    /// Execute something after one link has been parsed. Here 
-    /// </summary>
-    /// <param name="state"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    protected abstract Task UpdateStateAsync(JobState<TState> state, CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// The body of parsing.
     /// </summary>
     /// <param name="link"></param>
+    /// <param name="state"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected abstract Task<TModel?> ParseLinkAsync(TLink link, CancellationToken cancellationToken = default);
+    protected abstract Task<TModel?> ParseLinkAsync(TLink link, TState state, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Return how long to wait before the next crawling session.
@@ -93,13 +91,15 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : ICrawlerJob<TState
     /// Do something when crawling session finished.
     /// </summary>
     /// <param name="state"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected abstract Task OnSessionStartAsync(JobState<TState> state);
+    protected abstract Task OnSessionStartAsync(JobState<TState> state, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Do something when crawling session started.
     /// </summary>
     /// <param name="state"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected abstract Task OnSessionFinishAsync(JobState<TState> state);
+    protected abstract Task OnSessionFinishAsync(JobState<TState> state, CancellationToken cancellationToken = default);
 }
