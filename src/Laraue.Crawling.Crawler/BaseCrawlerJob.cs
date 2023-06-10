@@ -28,9 +28,6 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : BaseJob<TState>
     /// <inheritdoc />
     public override async Task<TimeSpan> ExecuteAsync(JobState<TState> jobState, CancellationToken stoppingToken)
     {
-        var sessionStopwatch = new Stopwatch();
-        sessionStopwatch.Start();
-
         await OnSessionStartAsync(jobState, stoppingToken).ConfigureAwait(false);
         
         var pageStopwatch = new Stopwatch();
@@ -41,17 +38,18 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : BaseJob<TState>
             var link = await GetNextLinkAsync(jobState, stoppingToken).ConfigureAwait(false);
             if (link == null)
             {
-                _logger.LogInformation("Crawling session finished for {Time}", sessionStopwatch.Elapsed);
-
-                await OnSessionFinishAsync(jobState, stoppingToken).ConfigureAwait(false);
-            
-                return GetTimeToWait();
+                return await RunSessionFinishAsync(jobState, stoppingToken).ConfigureAwait(false);
             }
             
             _logger.LogInformation("Page {Page} processing started", link);
             
-            await ParseLinkAsync(link, jobState, stoppingToken).ConfigureAwait(false);
-            await AfterLinkParsedAsync(link, jobState, stoppingToken).ConfigureAwait(false);
+            var result = await ParseLinkAsync(link, jobState, stoppingToken).ConfigureAwait(false);
+            if (result is null)
+            {
+                return await RunSessionFinishAsync(jobState, stoppingToken).ConfigureAwait(false);
+            }
+            
+            await AfterLinkParsedAsync(link, result, jobState, stoppingToken).ConfigureAwait(false);
             
             _logger.LogInformation(
                 "Page {Page} processing finished for {Time}",
@@ -60,6 +58,13 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : BaseJob<TState>
         
             stoppingToken.ThrowIfCancellationRequested();
         }
+    }
+
+    private async Task<TimeSpan> RunSessionFinishAsync(JobState<TState> jobState, CancellationToken stoppingToken = default)
+    {
+        await OnSessionFinishAsync(jobState, stoppingToken).ConfigureAwait(false);
+        
+        return GetTimeToWait();
     }
 
     /// <summary>
@@ -105,8 +110,9 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : BaseJob<TState>
     /// Execute something after one link has been parsed. 
     /// </summary>
     /// <param name="link"></param>
+    /// <param name="model"></param>
     /// <param name="state"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected abstract Task AfterLinkParsedAsync(TLink link, JobState<TState> state, CancellationToken cancellationToken = default);
+    protected abstract Task AfterLinkParsedAsync(TLink link, TModel model, JobState<TState> state, CancellationToken cancellationToken = default);
 }
