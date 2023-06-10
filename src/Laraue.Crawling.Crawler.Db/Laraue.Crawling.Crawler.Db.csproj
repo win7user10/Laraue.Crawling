@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <Description>The set of classes to write a program for a data crawling with state in DB.</Description>
+        <RepositoryType>git</RepositoryType>
+        <Authors>Belyanskiy Ilya</Authors>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Laraue.Core.Extensions.Hosting.EfCore" Version="7.2.2" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Laraue.Crawling.Crawler\Laraue.Crawling.Crawler.csproj" />
+    </ItemGroup>
+
+</Project>
