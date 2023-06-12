@@ -12,7 +12,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Laraue.Core.Extensions.Hosting.EfCore" Version="7.2.3" />
+        <PackageReference Include="Laraue.Core.Extensions.Hosting.EfCore" Version="7.2.4" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
     </ItemGroup>
 

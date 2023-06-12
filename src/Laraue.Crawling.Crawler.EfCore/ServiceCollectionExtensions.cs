@@ -1,7 +1,7 @@
 ﻿using Laraue.Core.Extensions.Hosting.EfCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Laraue.Crawling.Crawler.Db;
+namespace Laraue.Crawling.Crawler.EfCore;
 
 public static class ServiceCollectionExtensions
 {

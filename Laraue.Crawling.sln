@@ -24,7 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "static", "static", "{BB8F0D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{9CAB33F5-B682-469F-98A8-306A6D83E422}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laraue.Crawling.Crawler.Db", "src\Laraue.Crawling.Crawler.Db\Laraue.Crawling.Crawler.Db.csproj", "{09CECD4A-E23B-422E-8CF7-A26EB0EE5F9B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laraue.Crawling.Crawler.EfCore", "src\Laraue.Crawling.Crawler.EfCore\Laraue.Crawling.Crawler.EfCore.csproj", "{09CECD4A-E23B-422E-8CF7-A26EB0EE5F9B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
