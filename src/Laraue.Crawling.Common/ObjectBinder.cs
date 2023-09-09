@@ -15,11 +15,20 @@ public sealed class ObjectBinder<T> : ObjectBinder, IObjectBinder<T>
     {
     }
 
+    /// <inheritdoc />
     public void BindProperty<TProperty>(Expression<Func<T, TProperty?>> selector, TProperty? value)
     {
         BindProperty((LambdaExpression)selector, value);
     }
 
+    /// <inheritdoc />
+    public async Task BindPropertyAsync<TProperty>(Expression<Func<T, TProperty?>> selector, Task<TProperty?> getValueTask)
+    {
+        var value = await getValueTask.ConfigureAwait(false);
+        BindProperty((LambdaExpression)selector, value);
+    }
+
+    /// <inheritdoc />
     public TProperty GetProperty<TProperty>(Func<T, TProperty> selector)
     {
         return selector(Instance);

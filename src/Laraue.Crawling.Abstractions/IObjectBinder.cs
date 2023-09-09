@@ -15,6 +15,15 @@ public interface IObjectBinder<T>
     /// <param name="value"></param>
     /// <typeparam name="TProperty"></typeparam>
     public void BindProperty<TProperty>(Expression<Func<T, TProperty?>> selector, TProperty? value);
+
+    /// <summary>
+    /// Await the task and sets the value to the specified property. Only <see cref="MemberExpression"/> is supported.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="getValueTask"></param>
+    /// <typeparam name="TProperty"></typeparam>
+    /// <returns></returns>
+    public Task BindPropertyAsync<TProperty>(Expression<Func<T, TProperty?>> selector, Task<TProperty?> getValueTask);
     
     /// <summary>
     /// Gets the current value of the model using the specified selector.
