@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Laraue.Core.Extensions.Hosting" Version="7.2.4" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
   </ItemGroup>
 
   <ItemGroup>

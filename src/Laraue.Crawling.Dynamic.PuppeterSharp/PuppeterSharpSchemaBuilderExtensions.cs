@@ -30,19 +30,23 @@ public static class PuppeterSharpSchemaBuilderExtensions
 
     /// <summary>
     /// Binds the selected property with a value taken from the
-    /// passed delegate and casted to the specified type.
+    /// inner text mapped by the passed function.
     /// </summary>
     /// <returns></returns>
     public static HtmlSchemaBuilder<IElementHandle, TModel> HasProperty<TModel, TValue>(
         this HtmlSchemaBuilder<IElementHandle, TModel> schemaBuilder,
         Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector htmlSelector,
-        Func<IElementHandle, TValue?> getValue)
+        Func<string?, TValue?> getValue)
     {
         return schemaBuilder.HasProperty(
             schemaProperty,
             htmlSelector,
-            element => Task.FromResult(getValue(element)));
+            async element =>
+            {
+                var text = await element.GetInnerTextAsync().ConfigureAwait(false);
+                return getValue(text);
+            });
     }
 
     /// <summary>
