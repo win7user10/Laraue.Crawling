@@ -27,6 +27,28 @@ public static class PuppeterSharpSchemaBuilderExtensions
             htmlSelector,
             element => element.GetAttributeValueAsync(attributeName));
     }
+    
+    /// <summary>
+    /// Binds the selected property with an attribute value of the
+    /// selected element mapped to the specified type by the passed function.
+    /// </summary>
+    /// <returns></returns>
+    public static HtmlSchemaBuilder<IElementHandle, TModel> HasProperty<TModel, TValue>(
+        this HtmlSchemaBuilder<IElementHandle, TModel> schemaBuilder,
+        Expression<Func<TModel, TValue?>> schemaProperty,
+        HtmlSelector htmlSelector,
+        Func<string?, TValue?> getValue,
+        string attributeName)
+    {
+        return schemaBuilder.HasProperty(
+            schemaProperty,
+            htmlSelector,
+            async element =>
+            {
+                var value = await element.GetAttributeValueAsync(attributeName).ConfigureAwait(false);
+                return getValue(value);
+            });
+    }
 
     /// <summary>
     /// Binds the selected property with a value taken from the

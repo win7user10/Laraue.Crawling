@@ -1,4 +1,5 @@
-﻿using Laraue.Crawling.Dynamic.PuppeterSharp;
+﻿using Laraue.Crawling.Common.Extensions;
+using Laraue.Crawling.Dynamic.PuppeterSharp;
 using Microsoft.Extensions.Logging;
 using PuppeteerSharp;
 using Xunit;
@@ -24,16 +25,56 @@ public sealed class PuppeterSharpParserTests : IAsyncLifetime
     }
     
     [Fact]
-    public async Task AttributeShouldBeParsedCorrectlyAsync()
+    public async Task AttributeValue_ShouldBeBindCorrectlyAsync()
     {
-        await LoadHtmlAsync("<html><body><meta itemprop=price content=11500000></meta></body></html>");
+        var model = await TestAsync<Model>(
+            htmlTemplate: "<meta itemprop=price content=11500000></meta>",
+            builder => builder
+                .HasProperty(x => x.StringValue,  htmlSelector: "meta[itemprop=price]", attributeName: "content"));
+        
+        Assert.Equal("11500000", model.StringValue);
+    }
+    
+    [Fact]
+    public async Task AttributeValue_ShouldBeBindCorrectly_ViaImplicitCastAsync()
+    {
+        var model = await TestAsync<Model>(
+            htmlTemplate: "<meta itemprop=price content=11500000></meta>",
+            builder => builder
+                .HasProperty(x => x.LongValue,  htmlSelector: "meta[itemprop=price]", attributeName: "content"));
+        
+        Assert.Equal(11500000, model.LongValue);
+    }
+    
+    [Fact]
+    public async Task AttributeValue_ShouldBeBindCorrectly_ViaMapFunctionCastAsync()
+    {
+        var model = await TestAsync<Model>(
+            htmlTemplate: "<meta itemprop=price content=11500000RUB></meta>",
+            builder => builder
+                .HasProperty(
+                    x => x.LongValue,
+                    htmlSelector: "meta[itemprop=price]",
+                    attributeName: "content",
+                    getValue: s => long.Parse(s.GetOnlyDigits())));
+        
+        Assert.Equal(11500000, model.LongValue);
+    }
 
-        var schema = new PuppeterSharpSchemaBuilder<Model>();
-        schema.HasProperty(x => x.Price,  htmlSelector: "meta[itemprop=price]", attributeName: "content");
+    private async Task<TModel> TestAsync<TModel>(
+        string htmlTemplate,
+        Action<PuppeterSharpSchemaBuilder<TModel>> buildSchema)
+        where TModel : class
+    {
+        var fullTemplate = $"<html><body>{htmlTemplate}</body></html>";
+
+        var schemaBuilder = new PuppeterSharpSchemaBuilder<TModel>();
+
+        buildSchema(schemaBuilder);
         
-        var model = await _parser.RunAsync(schema.Build(), await _page.QuerySelectorAsync("body"));
+        await LoadHtmlAsync(fullTemplate);
         
-        Assert.Equal("11500000", model.Price);
+        return await _parser.RunAsync(schemaBuilder.Build(), await _page.QuerySelectorAsync("body"));
     }
 
     private Task LoadHtmlAsync(string html)
@@ -43,7 +84,8 @@ public sealed class PuppeterSharpParserTests : IAsyncLifetime
         
     private sealed class Model
     {
-        public string Price { get; init; }
+        public string StringValue { get; init; }
+        public long LongValue { get; init; }
     }
 
     public async Task DisposeAsync()
