@@ -19,7 +19,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
     public HtmlSchemaBuilder<TElement, TModel> HasProperty<TValue>(
         Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector htmlSelector,
-        GetValueDelegate<TElement, TValue> mapFunction)
+        GetValueDelegate<TElement, TValue> getValueDelegate)
     {
         var property = Helper.GetParsingProperty(schemaProperty);
         
@@ -27,7 +27,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
             typeof(TValue),
             new SetPropertyInfo(property),
             htmlSelector,
-            async element => await mapFunction.Invoke(element).ConfigureAwait(false));
+            async element => await getValueDelegate.Invoke(element).ConfigureAwait(false));
         
         BindingExpressions.Add(bindingExpression);
 

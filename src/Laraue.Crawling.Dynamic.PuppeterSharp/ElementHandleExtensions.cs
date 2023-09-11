@@ -34,10 +34,10 @@ public static class ElementHandleExtensions
     }
     
     /// <summary>
-    /// Check does the passed element handle contains the passed <param name="className"></param>.
+    /// Check does the passed element handle contains the passed class name.
     /// </summary>
     /// <param name="elementHandle"></param>
-    /// <param name="className"></param>
+    /// <param name="className">Class name to check.</param>
     /// <returns></returns>
     public static async Task<bool> HasClassAsync(this IElementHandle? elementHandle, string className)
     {

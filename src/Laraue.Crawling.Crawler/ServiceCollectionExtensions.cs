@@ -3,6 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Laraue.Crawling.Crawler;
 
+/// <summary>
+/// DI extensions for crawlers.
+/// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>

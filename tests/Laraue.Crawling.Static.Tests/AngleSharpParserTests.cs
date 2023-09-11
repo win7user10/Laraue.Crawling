@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Laraue.Crawling.Static.AngleSharp;
@@ -43,9 +42,9 @@ public class AngleSharpParserTests
         var visitor = new AngleSharpParser(new NullLoggerFactory());
 
         var html = await File.ReadAllTextAsync("test.html");
-        var model = await visitor.RunAsync(schema, html);
+        var model = await visitor.RunAsync(schema, html)!;
         
-        Assert.Equal("Private info", model.Title);
+        Assert.Equal("Private info", model!.Title);
         Assert.Equal("Alex", model.User.Name);
         Assert.Equal(10, model.User.Age);
 
@@ -71,9 +70,9 @@ public class AngleSharpParserTests
 
 public record OnePage
 {
-    public string Title { get; init; }
-    public string[] ImageLinks { get; init; }
-    public User User { get; init; }
+    public required string Title { get; init; }
+    public required string[] ImageLinks { get; init; }
+    public required User User { get; init; }
 }
 
 public record User(string Name, int Age, Dog[] Dogs);
