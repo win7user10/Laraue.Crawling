@@ -225,7 +225,13 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
         }
         catch (JsonException e)
         {
-            throw new InvalidCastException($"The property {context} cannot be parsed", e);
+            throw new InvalidCastException($"The property {context} could not be parsed", e);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Value {Path} binding error", context.ToString());
+
+            throw;
         }
     }
     

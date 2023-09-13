@@ -37,8 +37,8 @@ public static class PuppeterSharpSchemaBuilderExtensions
         this HtmlSchemaBuilder<IElementHandle, TModel> schemaBuilder,
         Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector htmlSelector,
-        Func<string?, TValue?> getValue,
-        string attributeName)
+        string attributeName,
+        Func<string?, TValue?> getValue)
     {
         return schemaBuilder.HasProperty(
             schemaProperty,
