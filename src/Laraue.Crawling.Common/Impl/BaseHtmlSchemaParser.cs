@@ -69,14 +69,23 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
         {
             childContext = childContext.Push(bindingExpression.SetPropertyInfo.PropertyInfo.Name);
         }
-        
-        return bindingExpression switch
+
+        try
         {
-            BindObjectExpression<TElement> complexType => ParseAsync(complexType, document, childContext),
-            BindArrayExpression<TElement> arrayType => ParseAsync(arrayType, document, childContext),
-            BindValueExpression<TElement> simpleType => ParseAsync(simpleType, document, childContext),
-            _ => throw new NotImplementedException()
-        };
+            return bindingExpression switch
+            {
+                BindObjectExpression<TElement> complexType => ParseAsync(complexType, document, childContext),
+                BindArrayExpression<TElement> arrayType => ParseAsync(arrayType, document, childContext),
+                BindValueExpression<TElement> simpleType => ParseAsync(simpleType, document, childContext),
+                _ => throw new InvalidOperationException()
+            };
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Value {Path} binding error", context.ToString());
+
+            throw;
+        }
     }
 
     /// <summary>
@@ -226,12 +235,6 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
         catch (JsonException e)
         {
             throw new InvalidCastException($"The property {context} could not be parsed", e);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Value {Path} binding error", context.ToString());
-
-            throw;
         }
     }
     
