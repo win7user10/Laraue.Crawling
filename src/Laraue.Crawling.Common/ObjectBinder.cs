@@ -24,8 +24,15 @@ public sealed class ObjectBinder<T> : ObjectBinder, IObjectBinder<T>
     /// <inheritdoc />
     public async Task BindPropertyAsync<TProperty>(Expression<Func<T, TProperty?>> selector, Task<TProperty?> getValueTask)
     {
-        var value = await getValueTask.ConfigureAwait(false);
-        BindProperty((LambdaExpression)selector, value);
+        try
+        {
+            var value = await getValueTask.ConfigureAwait(false);
+            BindProperty((LambdaExpression)selector, value);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Delegate {Delegate} build failed", getValueTask);
+        }
     }
 
     /// <inheritdoc />
@@ -38,10 +45,10 @@ public sealed class ObjectBinder<T> : ObjectBinder, IObjectBinder<T>
 public class ObjectBinder : IObjectBinder
 {
     protected readonly object? _instance;
-    private readonly ILogger<ObjectBinder> _logger;
+    protected readonly ILogger<ObjectBinder> _logger;
     private readonly VisitorContext _visitorContext;
 
-    public ObjectBinder(object? instance, ILogger<ObjectBinder> logger, VisitorContext visitorContext)
+    protected ObjectBinder(object? instance, ILogger<ObjectBinder> logger, VisitorContext visitorContext)
     {
         _instance = instance;
         _logger = logger;
