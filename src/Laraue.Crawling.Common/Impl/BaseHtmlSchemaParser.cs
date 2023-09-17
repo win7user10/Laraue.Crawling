@@ -44,7 +44,7 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
         
         stopWatch.Stop();
         
-        _logger.LogDebug("Binding finished for {Time}", stopWatch.Elapsed);
+        _logger.LogDebug("Bind finished for {Time}", stopWatch.Elapsed);
 
         return result;
     }
@@ -144,7 +144,7 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
         
         foreach (var element in complexType.ChildPropertiesBinders)
         {
-            await ProcessSchemaExpressionAsync(element, document, objectBinder, objectInstance, context)
+            await ProcessSchemaExpressionAsync(element, intermediateNode, objectBinder, objectInstance, context)
                 .ConfigureAwait(false);
         }
 

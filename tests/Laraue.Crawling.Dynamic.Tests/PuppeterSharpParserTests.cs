@@ -34,7 +34,7 @@ public sealed class PuppeterSharpParserTests : IAsyncLifetime
         
         Assert.Equal("11500000", model.StringValue);
     }
-    
+
     [Fact]
     public async Task AttributeValue_ShouldBeBindCorrectly_ViaImplicitCastAsync()
     {
@@ -59,6 +59,26 @@ public sealed class PuppeterSharpParserTests : IAsyncLifetime
                     getValue: s => long.Parse(s.GetOnlyDigits())));
         
         Assert.Equal(11500000, model.LongValue);
+    }
+    
+    [Fact]
+    public async Task AttributeValue_ShouldBeTakenCorrectlyWhenSelectorIsNotPassedAsync()
+    {
+        var model = await TestAsync<Model>(
+            htmlTemplate: "<meta itemprop=price content=11500000></meta>",
+            builder => builder
+                .HasObjectProperty(
+                    x => x.ChildValue,
+                    htmlSelector: "meta[itemprop=price]",
+                    childBuilder =>
+                    {
+                        childBuilder.HasProperty(
+                            x => x.StringValue,
+                            htmlSelector: null,
+                            attributeName: "content");
+                    }));
+        
+        Assert.Equal("11500000", model.ChildValue.StringValue);
     }
 
     private async Task<TModel> TestAsync<TModel>(
@@ -86,6 +106,8 @@ public sealed class PuppeterSharpParserTests : IAsyncLifetime
     {
         public string StringValue { get; init; }
         public long LongValue { get; init; }
+
+        public Model ChildValue { get; init; }
     }
 
     public async Task DisposeAsync()

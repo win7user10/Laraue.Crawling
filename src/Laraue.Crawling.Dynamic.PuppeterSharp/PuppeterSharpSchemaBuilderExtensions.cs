@@ -19,7 +19,7 @@ public static class PuppeterSharpSchemaBuilderExtensions
     public static HtmlSchemaBuilder<IElementHandle, TModel> HasProperty<TModel, TValue>(
         this HtmlSchemaBuilder<IElementHandle, TModel> schemaBuilder,
         Expression<Func<TModel, TValue?>> schemaProperty,
-        HtmlSelector htmlSelector,
+        HtmlSelector? htmlSelector,
         string attributeName)
     {
         return schemaBuilder.HasProperty(
@@ -36,7 +36,7 @@ public static class PuppeterSharpSchemaBuilderExtensions
     public static HtmlSchemaBuilder<IElementHandle, TModel> HasProperty<TModel, TValue>(
         this HtmlSchemaBuilder<IElementHandle, TModel> schemaBuilder,
         Expression<Func<TModel, TValue?>> schemaProperty,
-        HtmlSelector htmlSelector,
+        HtmlSelector? htmlSelector,
         string attributeName,
         Func<string?, TValue?> getValue)
     {
@@ -58,7 +58,7 @@ public static class PuppeterSharpSchemaBuilderExtensions
     public static HtmlSchemaBuilder<IElementHandle, TModel> HasProperty<TModel, TValue>(
         this HtmlSchemaBuilder<IElementHandle, TModel> schemaBuilder,
         Expression<Func<TModel, TValue?>> schemaProperty,
-        HtmlSelector htmlSelector,
+        HtmlSelector? htmlSelector,
         Func<string?, TValue?> getValue)
     {
         return schemaBuilder.HasProperty(
@@ -79,7 +79,7 @@ public static class PuppeterSharpSchemaBuilderExtensions
     public static HtmlSchemaBuilder<IElementHandle, TModel> HasProperty<TModel, TValue>(
         this HtmlSchemaBuilder<IElementHandle, TModel> schemaBuilder,
         Expression<Func<TModel, TValue?>> schemaProperty,
-        HtmlSelector htmlSelector)
+        HtmlSelector? htmlSelector)
     {
         return schemaBuilder.HasProperty(
             schemaProperty,
@@ -95,7 +95,7 @@ public static class PuppeterSharpSchemaBuilderExtensions
     public static HtmlSchemaBuilder<IElementHandle, TModel> HasProperty<TModel, TValue>(
         this HtmlSchemaBuilder<IElementHandle, TModel> schemaBuilder,
         Expression<Func<TModel, TValue?>> schemaProperty,
-        HtmlSelector htmlSelector,
+        HtmlSelector? htmlSelector,
         Func<IElementHandle, Task<string?>> getValueTask)
     {
         return schemaBuilder.HasProperty(

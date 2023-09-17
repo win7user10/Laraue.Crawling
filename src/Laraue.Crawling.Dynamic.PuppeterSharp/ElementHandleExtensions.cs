@@ -54,7 +54,7 @@ public static class ElementHandleExtensions
     /// <returns></returns>
     public static Task<string?> GetAttributeValueAsync(this IElementHandle? elementHandle, string attributeName)
     {
-        return  elementHandle is null
+        return elementHandle is null
             ? Task.FromResult<string?>(null)
             : elementHandle.EvaluateFunctionAsync<string?>($"e => e.attributes?.{attributeName}?.nodeValue");
     }

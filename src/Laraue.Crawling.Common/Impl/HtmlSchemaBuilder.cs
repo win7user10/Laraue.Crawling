@@ -18,7 +18,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
     
     public HtmlSchemaBuilder<TElement, TModel> HasProperty<TValue>(
         Expression<Func<TModel, TValue?>> schemaProperty,
-        HtmlSelector htmlSelector,
+        HtmlSelector? htmlSelector,
         GetValueDelegate<TElement, TValue> getValueDelegate)
     {
         var property = Helper.GetParsingProperty(schemaProperty);
@@ -36,7 +36,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
 
     public HtmlSchemaBuilder<TElement, TModel> HasObjectProperty<TValue>(
         Expression<Func<TModel, TValue?>> schemaProperty,
-        HtmlSelector htmlSelector,
+        HtmlSelector? htmlSelector,
         Action<HtmlSchemaBuilder<TElement, TValue>> childBuilder)
     {
         var property = Helper.GetParsingProperty(schemaProperty);
@@ -58,7 +58,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
 
     public HtmlSchemaBuilder<TElement, TModel> HasArrayProperty<TValue>(
         Expression<Func<TModel, TValue[]?>> schemaProperty,
-        HtmlSelector htmlSelector,
+        HtmlSelector? htmlSelector,
         GetValueDelegate<TElement?, TValue> mapFunction)
     {
         var property = Helper.GetParsingProperty(schemaProperty);
@@ -80,7 +80,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
 
     public HtmlSchemaBuilder<TElement, TModel> HasArrayProperty<TValue>(
         Expression<Func<TModel, TValue[]?>> schemaProperty,
-        HtmlSelector htmlSelector,
+        HtmlSelector? htmlSelector,
         Action<HtmlSchemaBuilder<TElement, TValue>> childBuilder)
     {
         var property = Helper.GetParsingProperty(schemaProperty);

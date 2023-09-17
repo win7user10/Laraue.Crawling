@@ -15,9 +15,11 @@ public record HtmlSelector
     /// </summary>
     /// <param name="selector"></param>
     /// <returns></returns>
-    public static implicit operator HtmlSelector(string selector)
+    public static implicit operator HtmlSelector?(string? selector)
     {
-        return new HtmlSelector { Selector = selector };
+        return selector == null
+            ? null
+            : new HtmlSelector { Selector = selector };
     }
 
     public override string ToString()
