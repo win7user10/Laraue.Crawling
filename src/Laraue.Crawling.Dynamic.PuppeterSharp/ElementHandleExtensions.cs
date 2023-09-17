@@ -56,7 +56,7 @@ public static class ElementHandleExtensions
     {
         return elementHandle is null
             ? Task.FromResult<string?>(null)
-            : elementHandle.EvaluateFunctionAsync<string?>($"e => e.attributes?.{attributeName}?.nodeValue");
+            : elementHandle.EvaluateFunctionAsync<string?>($"e => e.getAttribute('{attributeName}')");
     }
     
     /// <summary>
