@@ -1,4 +1,6 @@
-﻿using Laraue.Crawling.Dynamic.PuppeterSharp.Utils;
+﻿using Laraue.Crawling.Abstractions;
+using Laraue.Crawling.Dynamic.PuppeterSharp.Abstractions;
+using Laraue.Crawling.Dynamic.PuppeterSharp.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using PuppeteerSharp;
 
@@ -10,7 +12,7 @@ namespace Laraue.Crawling.Dynamic.PuppeterSharp.Extensions;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Add <see cref="IBrowserFactory"/> implementation to the container.
+    /// Add puppeteer crawling services to the container.
     /// </summary>
     /// <param name="serviceCollection"></param>
     /// <param name="launchOptions"></param>
@@ -19,6 +21,9 @@ public static class ServiceCollectionExtensions
         this IServiceCollection serviceCollection,
         LaunchOptions launchOptions)
     {
-        return serviceCollection.AddSingleton<IBrowserFactory>(new BrowserFactory(launchOptions));
+        return serviceCollection
+            .AddSingleton<IBrowserFactory>(new BrowserFactory(launchOptions))
+            .AddSingleton<IHtmlSchemaParser<IElementHandle>, PuppeterSharpParser>()
+            .AddSingleton<IPageParser, PageParser>();
     }
 }
