@@ -15,7 +15,7 @@ public sealed class PageParser : IPageParser
     }
     
     /// <inheritdoc />
-    public async Task<TResult?> ParseAsync<TResult>(IPage page, ICompiledHtmlSchema<IElementHandle, TResult> schema)
+    public async Task<TResult> ParseAsync<TResult>(IPage page, ICompiledHtmlSchema<IElementHandle, TResult> schema)
     {
         var element = await page.QuerySelectorAsync("body")
             .ConfigureAwait(false);

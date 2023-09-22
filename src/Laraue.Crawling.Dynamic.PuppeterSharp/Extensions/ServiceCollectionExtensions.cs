@@ -17,7 +17,7 @@ public static class ServiceCollectionExtensions
     /// <param name="serviceCollection"></param>
     /// <param name="launchOptions"></param>
     /// <returns></returns>
-    public static IServiceCollection AddPuppeterFactory(
+    public static IServiceCollection AddCrawlingServices(
         this IServiceCollection serviceCollection,
         LaunchOptions launchOptions)
     {

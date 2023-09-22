@@ -46,22 +46,28 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : BaseJob<TState>
             {
                 var link = await GetNextLinkAsync(jobState, stoppingToken).ConfigureAwait(false);
                 _logger.LogInformation("Page {Page} processing started", link);
-            
+
                 var result = await ParseLinkAsync(link, jobState, stoppingToken).ConfigureAwait(false);
                 await AfterLinkParsedAsync(link, result, jobState, stoppingToken).ConfigureAwait(false);
-            
+
                 _logger.LogInformation(
                     "Page {Page} processing finished for {Time}",
                     link,
                     pageStopwatch.Elapsed);
-        
+
                 stoppingToken.ThrowIfCancellationRequested();
             }
             catch (SessionInterruptedException e)
             {
                 _logger.LogInformation("Session should be finished. Reason: {Message}", e.Message);
-                
-                return await RunSessionFinishAsync(jobState, stoppingToken);
+
+                return await RunSessionFinishAsync(jobState, stoppingToken).ConfigureAwait(false);
+            }
+            catch (CrawlerHasBeenDetectedException e)
+            {
+                _logger.LogInformation("Crawler has been detected. {Message}", e.Message);
+
+                await e.SwitchToCorrectStateAsync().ConfigureAwait(false);
             }
         }
     }
