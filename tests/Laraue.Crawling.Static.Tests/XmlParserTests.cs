@@ -15,7 +15,7 @@ public class XmlParserTests
     {
         var xml = @"
 <note>
-    <to>Tove</to>
+    <to id=""15"">Tove</to>
     <from>Jani</from>
     <heading>Reminder</heading>
     <body>Don't forget me this weekend!</body>
@@ -25,7 +25,8 @@ public class XmlParserTests
         var schema = new XmlSchemaBuilder<XmlContent>()
             .HasArrayProperty<Note>(x => x.Notes, "//note", builder =>
             {
-                builder.HasProperty(y => y.Body, "//body");
+                builder.HasProperty(y => y.Body, xPathSelector: "//body");
+                builder.HasProperty(y => y.Id, xPathSelector: "//to", attributeName: "id");
             })
             .Build();
 
@@ -37,6 +38,7 @@ public class XmlParserTests
         var note = Assert.Single(result!.Notes);
         
         Assert.Equal("Don't forget me this weekend!", note.Body);
+        Assert.Equal(15, note.Id);
     }
 
     private sealed record XmlContent
@@ -46,9 +48,7 @@ public class XmlParserTests
     
     private sealed record Note
     {
-        public string To { get; init; }
-        public string From { get; init; }
-        public string Heading { get; init; }
+        public int Id { get; init; }
         public string Body { get; init; }
     }
 }

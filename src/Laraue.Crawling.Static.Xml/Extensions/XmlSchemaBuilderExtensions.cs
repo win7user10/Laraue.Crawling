@@ -14,7 +14,7 @@ public static class XmlSchemaBuilderExtensions
     /// </summary>
     /// <param name="schemaBuilder"></param>
     /// <param name="schemaProperty"></param>
-    /// <param name="selector"></param>
+    /// <param name="xPathSelector"></param>
     /// <param name="modifyFunc"></param>
     /// <typeparam name="TModel"></typeparam>
     /// <typeparam name="TValue"></typeparam>
@@ -22,12 +22,12 @@ public static class XmlSchemaBuilderExtensions
     public static DocumentSchemaBuilder<XmlNode, XPathSelector, TModel> HasProperty<TModel, TValue>(
         this DocumentSchemaBuilder<XmlNode, XPathSelector, TModel> schemaBuilder,
         Expression<Func<TModel, TValue?>> schemaProperty,
-        XPathSelector? selector = null,
+        XPathSelector? xPathSelector = null,
         Func<string, string>? modifyFunc = null)
     {
         return schemaBuilder.HasProperty(
             schemaProperty,
-            selector,
+            xPathSelector,
             element =>
             {
                 var textContent = element.InnerText;
@@ -38,6 +38,22 @@ public static class XmlSchemaBuilderExtensions
                 }
                 
                 return Task.FromResult(StringValueMapper.Map<TValue>(textContent));
+            });
+    }
+    
+    public static DocumentSchemaBuilder<XmlNode, XPathSelector, TModel> HasProperty<TModel, TValue>(
+        this DocumentSchemaBuilder<XmlNode, XPathSelector, TModel>  schemaBuilder,
+        Expression<Func<TModel, TValue?>> schemaProperty,
+        XPathSelector? xPathSelector,
+        string attributeName)
+    {
+        return schemaBuilder.HasProperty(
+            schemaProperty,
+            xPathSelector,
+            element =>
+            {
+                var value = element.Attributes?.GetNamedItem(attributeName);
+                return Task.FromResult(StringValueMapper.Map<TValue>(value?.InnerText));
             });
     }
 }
