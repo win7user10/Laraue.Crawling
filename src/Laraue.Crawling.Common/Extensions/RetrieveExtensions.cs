@@ -61,25 +61,6 @@ public static class RetrieveExtensions
 
         return string.IsNullOrEmpty(numberString)
             ? default
-            : numberString.GetAs<T>();
-    }
-    
-    /// <summary>
-    /// Try return string as the passed type using deserialization.
-    /// </summary>
-    /// <param name="str"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    /// <exception cref="JsonException"></exception>
-    public static T? GetAs<T>(this string str)
-    {
-        try
-        {
-            return JsonSerializer.Deserialize<T>(str);
-        }
-        catch (JsonException e)
-        {
-            throw new JsonException($"Unable to parse {str} as {typeof(T)}", e);
-        }
+            : StringValueMapper.Map<T>(numberString);
     }
 }

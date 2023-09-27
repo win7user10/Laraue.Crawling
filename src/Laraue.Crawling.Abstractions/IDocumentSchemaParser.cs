@@ -1,9 +1,10 @@
 ﻿namespace Laraue.Crawling.Abstractions;
 
 /// <summary>
-/// <see cref="ICompiledHtmlSchema{TElement,TModel}"/> parser.
+/// <see cref="ICompiledDocumentSchema{TElement,TModel,TSelector}"/> parser.
 /// </summary>
-public interface IHtmlSchemaParser<TElement>
+public interface IDocumentSchemaParser<TElement, TSelector>
+    where TSelector : Selector
 {
     /// <summary>
     /// Parse passed schema and return the result.
@@ -13,6 +14,6 @@ public interface IHtmlSchemaParser<TElement>
     /// <typeparam name="TModel"></typeparam>
     /// <returns></returns>
     public Task<TModel?> RunAsync<TModel>(
-        ICompiledHtmlSchema<TElement, TModel> schema,
+        ICompiledDocumentSchema<TElement, TSelector, TModel> schema,
         TElement? rootElement);
 }

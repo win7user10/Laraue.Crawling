@@ -1,29 +1,14 @@
 ﻿namespace Laraue.Crawling.Abstractions;
 
-/// <summary>
-/// Represent html selector.
-/// </summary>
-public record HtmlSelector
+public sealed record HtmlSelector : Selector
 {
-    /// <summary>
-    /// Html selector.
-    /// </summary>
-    public string Selector { get; init; }
-
-    /// <summary>
-    /// Cast string to the <see cref="HtmlSelector"/>.
-    /// </summary>
-    /// <param name="selector"></param>
-    /// <returns></returns>
-    public static implicit operator HtmlSelector?(string? selector)
+    public HtmlSelector(string value)
+        : base(value)
     {
-        return selector == null
-            ? null
-            : new HtmlSelector { Selector = selector };
     }
 
-    public override string ToString()
+    public static implicit operator HtmlSelector(string value)
     {
-        return Selector;
+        return new HtmlSelector(value);
     }
-};
+}

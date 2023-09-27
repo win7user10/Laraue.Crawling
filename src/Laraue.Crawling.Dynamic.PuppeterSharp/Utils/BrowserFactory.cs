@@ -1,4 +1,5 @@
-﻿using PuppeteerSharp;
+﻿using Microsoft.Extensions.Logging;
+using PuppeteerSharp;
 
 namespace Laraue.Crawling.Dynamic.PuppeterSharp.Utils;
 
@@ -9,14 +10,17 @@ public sealed class BrowserFactory : IBrowserFactory
     private bool _isInitialized;
     private IBrowser? _browserInstance;
     private readonly LaunchOptions _launchOptions;
+    private readonly ILoggerFactory _loggerFactory;
 
     /// <summary>
     /// Initializes a new instance of <see cref="BrowserFactory"/>.
     /// </summary>
     /// <param name="launchOptions"></param>
-    public BrowserFactory(LaunchOptions launchOptions)
+    /// <param name="loggerFactory"></param>
+    public BrowserFactory(LaunchOptions launchOptions, ILoggerFactory loggerFactory)
     {
         _launchOptions = launchOptions;
+        _loggerFactory = loggerFactory;
     }
     
     /// <inheritdoc />
@@ -38,7 +42,9 @@ public sealed class BrowserFactory : IBrowserFactory
                 return _browserInstance;
             }
             
-            _browserInstance = await Puppeteer.LaunchAsync(_launchOptions).ConfigureAwait(false);
+            _browserInstance = await Puppeteer
+                .LaunchAsync(_launchOptions, _loggerFactory)
+                .ConfigureAwait(false);
 
             return _browserInstance;
         }

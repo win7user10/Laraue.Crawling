@@ -2,6 +2,7 @@
 using Laraue.Crawling.Dynamic.PuppeterSharp.Abstractions;
 using Laraue.Crawling.Dynamic.PuppeterSharp.Utils;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using PuppeteerSharp;
 
 namespace Laraue.Crawling.Dynamic.PuppeterSharp.Extensions;
@@ -22,8 +23,8 @@ public static class ServiceCollectionExtensions
         LaunchOptions launchOptions)
     {
         return serviceCollection
-            .AddSingleton<IBrowserFactory>(new BrowserFactory(launchOptions))
-            .AddSingleton<IHtmlSchemaParser<IElementHandle>, PuppeterSharpParser>()
+            .AddSingleton<IBrowserFactory>(sp => new BrowserFactory(launchOptions, sp.GetRequiredService<ILoggerFactory>()))
+            .AddSingleton<IDocumentSchemaParser<IElementHandle, HtmlSelector>, PuppeterSharpParser>()
             .AddSingleton<IPageParser, PageParser>();
     }
 }

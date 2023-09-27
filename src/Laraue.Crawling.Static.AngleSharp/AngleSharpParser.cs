@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Laraue.Crawling.Static.AngleSharp;
 
-public class AngleSharpParser : BaseHtmlSchemaParser<IElement>
+public class AngleSharpParser : BaseDocumentSchemaParser<IElement, HtmlSelector>
 {
     public AngleSharpParser(ILoggerFactory loggerFactory) : base(loggerFactory)
     {
@@ -13,12 +13,12 @@ public class AngleSharpParser : BaseHtmlSchemaParser<IElement>
     
     protected override Task<IElement?> GetElementAsync(IElement currentElement, HtmlSelector htmlSelector)
     {
-        return Task.FromResult(currentElement?.QuerySelector(htmlSelector.Selector));
+        return Task.FromResult(currentElement?.QuerySelector(htmlSelector.Value));
     }
 
     protected override Task<IElement[]?> GetElementsAsync(IElement currentElement, HtmlSelector htmlSelector)
     {
-        var result = currentElement?.QuerySelectorAll(htmlSelector.Selector);
+        var result = currentElement?.QuerySelectorAll(htmlSelector.Value);
 
         return Task.FromResult(result?.ToArray());
     }

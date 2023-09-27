@@ -10,7 +10,7 @@ namespace Laraue.Crawling.Static.Tests;
 public class AngleSharpParserTests
 {
     [Fact]
-    public async Task Scheme_ShouldBeParsedCorrectly()
+    public async Task Scheme_ShouldBeParsedCorrectlyAsync()
     {
         var schema = new AngleSharpSchemaBuilder<OnePage>()
             .HasProperty(x => x.Title, ".title")

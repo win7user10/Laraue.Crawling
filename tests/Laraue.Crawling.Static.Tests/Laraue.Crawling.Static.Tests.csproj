@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Laraue.Crawling.Static.AngleSharp\Laraue.Crawling.Static.AngleSharp.csproj" />
+    <ProjectReference Include="..\..\src\Laraue.Crawling.Static.Xml\Laraue.Crawling.Static.Xml.csproj" />
   </ItemGroup>
 
   <ItemGroup>

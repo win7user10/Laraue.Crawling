@@ -3,8 +3,10 @@
 /// <summary>
 /// Represents an expression for bind value to the property of the specified type.
 /// </summary>
-/// <typeparam name="TElement">The type of html provider.</typeparam>
-public abstract class BindExpression<TElement> : SchemaExpression<TElement>
+/// <typeparam name="TElement">The type of tree node.</typeparam>
+/// <typeparam name="TSelector"></typeparam>
+public abstract class BindExpression<TElement, TSelector> : SchemaExpression<TElement>
+    where TSelector : Selector
 {
     /// <summary>
     /// The type of object that this expression is bind.
@@ -20,12 +22,12 @@ public abstract class BindExpression<TElement> : SchemaExpression<TElement>
     /// If html selector is set, then it will be applied to the current element
     /// with html before execute binding.
     /// </summary>
-    public HtmlSelector? HtmlSelector { get; }
+    public TSelector? Selector { get; }
     
-    protected BindExpression(Type objectType, SetPropertyInfo? setPropertyInfo, HtmlSelector? htmlSelector)
+    protected BindExpression(Type objectType, SetPropertyInfo? setPropertyInfo, TSelector? selector)
     {
         ObjectType = objectType;
         SetPropertyInfo = setPropertyInfo;
-        HtmlSelector = htmlSelector;
+        Selector = selector;
     }
 }

@@ -6,11 +6,13 @@ namespace Laraue.Crawling.Abstractions;
 /// Schema ready for the crawling.
 /// </summary>
 /// <typeparam name="TModel"></typeparam>
+/// <typeparam name="TSelector"></typeparam>
 /// <typeparam name="TElement"></typeparam>
-public interface ICompiledHtmlSchema<TElement, in TModel>
+public interface ICompiledDocumentSchema<TElement, TSelector, in TModel>
+    where TSelector : Selector
 {
     /// <summary>
     /// Schema of the parsing for the current object.
     /// </summary>
-    public BindObjectExpression<TElement> BindingExpression { get; }
+    public BindObjectExpression<TElement, TSelector> BindingExpression { get; }
 }

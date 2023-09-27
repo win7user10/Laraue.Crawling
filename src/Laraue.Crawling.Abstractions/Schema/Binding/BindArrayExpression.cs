@@ -3,16 +3,17 @@
 /// <summary>
 /// Represents how to parse array property of the specified type.
 /// </summary>
-public sealed class BindArrayExpression<TElement> : BindExpression<TElement>
+public sealed class BindArrayExpression<TElement, TSelector> : BindExpression<TElement, TSelector>
+    where TSelector : Selector
 {
-    public BindExpression<TElement> Element { get; }
+    public BindExpression<TElement, TSelector> Element { get; }
     
     public BindArrayExpression(
         Type objectType,
         SetPropertyInfo? setPropertyInfo,
-        HtmlSelector? htmlSelector,
-        BindExpression<TElement> element)
-        : base(objectType, setPropertyInfo, htmlSelector)
+        TSelector? selector,
+        BindExpression<TElement, TSelector> element)
+        : base(objectType, setPropertyInfo, selector)
     {
         Element = element;
     }

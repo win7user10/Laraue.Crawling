@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Laraue.Crawling.Abstractions;
+using Laraue.Crawling.Common;
 using Laraue.Crawling.Common.Extensions;
 using Laraue.Crawling.Common.Impl;
 using PuppeteerSharp;
@@ -16,8 +17,8 @@ public static class PuppeterSharpSchemaBuilderExtensions
     /// selected element casted to the specified type.
     /// </summary>
     /// <returns></returns>
-    public static HtmlSchemaBuilder<IElementHandle, TModel> HasProperty<TModel, TValue>(
-        this HtmlSchemaBuilder<IElementHandle, TModel> schemaBuilder,
+    public static DocumentSchemaBuilder<IElementHandle, HtmlSelector, TModel> HasProperty<TModel, TValue>(
+        this DocumentSchemaBuilder<IElementHandle, HtmlSelector, TModel> schemaBuilder,
         Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector? htmlSelector,
         string attributeName)
@@ -33,8 +34,8 @@ public static class PuppeterSharpSchemaBuilderExtensions
     /// selected element mapped to the specified type by the passed function.
     /// </summary>
     /// <returns></returns>
-    public static HtmlSchemaBuilder<IElementHandle, TModel> HasProperty<TModel, TValue>(
-        this HtmlSchemaBuilder<IElementHandle, TModel> schemaBuilder,
+    public static DocumentSchemaBuilder<IElementHandle, HtmlSelector, TModel> HasProperty<TModel, TValue>(
+        this DocumentSchemaBuilder<IElementHandle, HtmlSelector, TModel> schemaBuilder,
         Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector? htmlSelector,
         string attributeName,
@@ -55,8 +56,8 @@ public static class PuppeterSharpSchemaBuilderExtensions
     /// inner text mapped by the passed function.
     /// </summary>
     /// <returns></returns>
-    public static HtmlSchemaBuilder<IElementHandle, TModel> HasProperty<TModel, TValue>(
-        this HtmlSchemaBuilder<IElementHandle, TModel> schemaBuilder,
+    public static DocumentSchemaBuilder<IElementHandle, HtmlSelector, TModel> HasProperty<TModel, TValue>(
+        this DocumentSchemaBuilder<IElementHandle, HtmlSelector, TModel> schemaBuilder,
         Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector? htmlSelector,
         Func<string?, TValue?> getValue)
@@ -76,8 +77,8 @@ public static class PuppeterSharpSchemaBuilderExtensions
     /// selected element casted to the specified type.
     /// </summary>
     /// <returns></returns>
-    public static HtmlSchemaBuilder<IElementHandle, TModel> HasProperty<TModel, TValue>(
-        this HtmlSchemaBuilder<IElementHandle, TModel> schemaBuilder,
+    public static DocumentSchemaBuilder<IElementHandle, HtmlSelector, TModel> HasProperty<TModel, TValue>(
+        this DocumentSchemaBuilder<IElementHandle, HtmlSelector, TModel> schemaBuilder,
         Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector? htmlSelector)
     {
@@ -92,8 +93,8 @@ public static class PuppeterSharpSchemaBuilderExtensions
     /// passed async delegate and casted to the specified type.
     /// </summary>
     /// <returns></returns>
-    public static HtmlSchemaBuilder<IElementHandle, TModel> HasProperty<TModel, TValue>(
-        this HtmlSchemaBuilder<IElementHandle, TModel> schemaBuilder,
+    public static DocumentSchemaBuilder<IElementHandle, HtmlSelector, TModel> HasProperty<TModel, TValue>(
+        this DocumentSchemaBuilder<IElementHandle, HtmlSelector, TModel> schemaBuilder,
         Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector? htmlSelector,
         Func<IElementHandle, Task<string?>> getValueTask)
@@ -104,14 +105,7 @@ public static class PuppeterSharpSchemaBuilderExtensions
             async element =>
             {
                 var htmlString = await getValueTask(element).ConfigureAwait(false);
-                if (htmlString is null)
-                {
-                    return default;
-                }
-                
-                return typeof(TValue) == typeof(string)
-                    ? (TValue)(dynamic) htmlString
-                    : htmlString.GetAs<TValue>();
+                return htmlString is null ? default : StringValueMapper.Map<TValue>(htmlString);
             });
     }
 }

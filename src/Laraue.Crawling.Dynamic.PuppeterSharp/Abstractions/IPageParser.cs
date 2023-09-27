@@ -14,5 +14,7 @@ public interface IPageParser
     /// <param name="page"></param>
     /// <param name="schema"></param>
     /// <returns></returns>
-    Task<TResult> ParseAsync<TResult>(IPage page, ICompiledHtmlSchema<IElementHandle, TResult> schema);
+    Task<TResult> ParseAsync<TResult>(
+        IPage page,
+        ICompiledDocumentSchema<IElementHandle, HtmlSelector, TResult> schema);
 }

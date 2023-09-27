@@ -6,16 +6,18 @@ namespace Laraue.Crawling.Abstractions.Schema.Binding;
 /// Represents how to parse object property of the specified type.
 /// </summary>
 /// <typeparam name="TElement"></typeparam>
-public sealed class BindValueExpression<TElement> : BindExpression<TElement>
+/// <typeparam name="TSelector"></typeparam>
+public sealed class BindValueExpression<TElement, TSelector> : BindExpression<TElement, TSelector>
+    where TSelector : Selector
 {
     public GetObjectValueDelegate<TElement> PropertyGetter { get; }
 
     public BindValueExpression(
         Type objectType,
         SetPropertyInfo? setPropertyInfo,
-        HtmlSelector? htmlSelector,
+        TSelector? selector,
         GetObjectValueDelegate<TElement> propertyGetter)
-        : base(objectType, setPropertyInfo, htmlSelector)
+        : base(objectType, setPropertyInfo, selector)
     {
         PropertyGetter = propertyGetter;
     }

@@ -1,6 +1,7 @@
 ﻿namespace Laraue.Crawling.Abstractions.Schema.Binding;
 
-public class BindObjectExpression<TElement> : BindExpression<TElement>
+public class BindObjectExpression<TElement, TSelector> : BindExpression<TElement, TSelector>
+    where TSelector : Selector
 {
     /// <summary>
     /// Array of expressions that used to bind 
@@ -10,9 +11,9 @@ public class BindObjectExpression<TElement> : BindExpression<TElement>
     public BindObjectExpression(
         Type objectType,
         SetPropertyInfo? setPropertyInfo,
-        HtmlSelector? htmlSelector,
+        TSelector? selector,
         SchemaExpression<TElement>[] childPropertiesBinders)
-        : base(objectType, setPropertyInfo, htmlSelector)
+        : base(objectType, setPropertyInfo, selector)
     {
         ChildPropertiesBinders = childPropertiesBinders;
     }

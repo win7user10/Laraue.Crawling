@@ -9,7 +9,7 @@ namespace Laraue.Crawling.Dynamic.PuppeterSharp;
 /// The implementation of the crawler based on the
 /// <see href="https://github.com/hardkoded/puppeteer-sharp">PupeeterSharp</see> library.
 /// </summary>
-public class PuppeterSharpParser : BaseHtmlSchemaParser<IElementHandle>
+public class PuppeterSharpParser : BaseDocumentSchemaParser<IElementHandle, HtmlSelector>
 {
     /// <summary>
     /// Initializes a new instance of <see cref="PuppeterSharpParser"/>.
@@ -23,16 +23,16 @@ public class PuppeterSharpParser : BaseHtmlSchemaParser<IElementHandle>
     /// <inheritdoc />
     protected override Task<IElementHandle?> GetElementAsync(
         IElementHandle currentElement,
-        HtmlSelector htmlSelector)
+        HtmlSelector selector)
     {
-        return currentElement.QuerySelectorAsync(htmlSelector.Selector);
+        return currentElement.QuerySelectorAsync(selector.Value);
     }
 
     /// <inheritdoc />
     protected override Task<IElementHandle[]?> GetElementsAsync(
         IElementHandle currentElement,
-        HtmlSelector htmlSelector)
+        HtmlSelector selector)
     {
-        return currentElement.QuerySelectorAllAsync(htmlSelector.Selector);
+        return currentElement.QuerySelectorAllAsync(selector.Value);
     }
 }

@@ -7,15 +7,15 @@ namespace Laraue.Crawling.Dynamic.PuppeterSharp;
 /// <inheritdoc />
 public sealed class PageParser : IPageParser
 {
-    private readonly IHtmlSchemaParser<IElementHandle> _schemaParser;
+    private readonly IDocumentSchemaParser<IElementHandle, HtmlSelector> _schemaParser;
     
-    public PageParser(IHtmlSchemaParser<IElementHandle> schemaParser)
+    public PageParser(IDocumentSchemaParser<IElementHandle, HtmlSelector> schemaParser)
     {
         _schemaParser = schemaParser;
     }
     
     /// <inheritdoc />
-    public async Task<TResult> ParseAsync<TResult>(IPage page, ICompiledHtmlSchema<IElementHandle, TResult> schema)
+    public async Task<TResult> ParseAsync<TResult>(IPage page, ICompiledDocumentSchema<IElementHandle, HtmlSelector, TResult> schema)
     {
         var element = await page.QuerySelectorAsync("body")
             .ConfigureAwait(false);

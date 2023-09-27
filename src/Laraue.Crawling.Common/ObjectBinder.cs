@@ -8,7 +8,7 @@ namespace Laraue.Crawling.Common;
 
 public sealed class ObjectBinder<T> : ObjectBinder, IObjectBinder<T>
 {
-    private T Instance => (T)_instance!;
+    private T TypedInstance => (T)Instance!;
     
     public ObjectBinder(T instance, ILoggerFactory loggerFactory, VisitorContext visitorContext)
         : base(instance, loggerFactory.CreateLogger<ObjectBinder<T>>(), visitorContext)
@@ -31,44 +31,45 @@ public sealed class ObjectBinder<T> : ObjectBinder, IObjectBinder<T>
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Delegate {Delegate} build failed", getValueTask);
+            Logger.LogError(e, "Bind {Property} failed", selector);
         }
     }
 
     /// <inheritdoc />
     public TProperty GetProperty<TProperty>(Func<T, TProperty> selector)
     {
-        return selector(Instance);
+        return selector(TypedInstance);
     }
 }
 
 public class ObjectBinder : IObjectBinder
 {
-    protected readonly object? _instance;
-    protected readonly ILogger<ObjectBinder> _logger;
+    protected readonly object? Instance;
+    protected readonly ILogger<ObjectBinder> Logger;
     private readonly VisitorContext _visitorContext;
 
     protected ObjectBinder(object? instance, ILogger<ObjectBinder> logger, VisitorContext visitorContext)
     {
-        _instance = instance;
-        _logger = logger;
+        Instance = instance;
+        Logger = logger;
         _visitorContext = visitorContext;
     }
     
+    /// <inheritdoc />
     public void BindProperty(LambdaExpression selector, object? value)
     {
         var propertyInfo = Helper.GetParsingProperty(selector);
 
-        if (_instance is null)
+        if (Instance is null)
         {
             return;
         }
 
         var propertyContext = _visitorContext.Push(propertyInfo.Name);
         
-        _logger.LogTrace("Bind Property: {Path} Value: {Value}", propertyContext, value);
+        Logger.LogTrace("Bind Property: {Path} Value: {Value}", propertyContext, value);
         
-        propertyInfo.SetValue(_instance, value);
+        propertyInfo.SetValue(Instance, value);
     }
 }
 

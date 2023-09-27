@@ -7,23 +7,25 @@ using Laraue.Crawling.Abstractions.Schema.Delegates;
 namespace Laraue.Crawling.Common.Impl;
 
 /// <summary>
-/// Builder for the static html schema. "Static" means static html,
-/// it will not use a browser for the crawling.
+/// Builder for the static schema. "Static" means static document,
+/// which is just a text that will no change.
 /// </summary>
 /// <typeparam name="TElement"></typeparam>
+/// <typeparam name="TSelector"></typeparam>
 /// <typeparam name="TModel"></typeparam>
-public class HtmlSchemaBuilder<TElement, TModel>
+public class DocumentSchemaBuilder<TElement, TSelector, TModel>
+    where TSelector : Selector
 {
     public readonly List<SchemaExpression<TElement>> BindingExpressions = new ();
     
-    public HtmlSchemaBuilder<TElement, TModel> HasProperty<TValue>(
+    public DocumentSchemaBuilder<TElement, TSelector, TModel> HasProperty<TValue>(
         Expression<Func<TModel, TValue?>> schemaProperty,
-        HtmlSelector? htmlSelector,
+        TSelector? htmlSelector,
         GetValueDelegate<TElement, TValue> getValueDelegate)
     {
         var property = Helper.GetParsingProperty(schemaProperty);
         
-        var bindingExpression = new BindValueExpression<TElement>(
+        var bindingExpression = new BindValueExpression<TElement, TSelector>(
             typeof(TValue),
             new SetPropertyInfo(property),
             htmlSelector,
@@ -34,10 +36,10 @@ public class HtmlSchemaBuilder<TElement, TModel>
         return this;
     }
 
-    public HtmlSchemaBuilder<TElement, TModel> HasObjectProperty<TValue>(
+    public DocumentSchemaBuilder<TElement, TSelector, TModel> HasObjectProperty<TValue>(
         Expression<Func<TModel, TValue?>> schemaProperty,
-        HtmlSelector? htmlSelector,
-        Action<HtmlSchemaBuilder<TElement, TValue>> childBuilder)
+        TSelector? htmlSelector,
+        Action<DocumentSchemaBuilder<TElement, TSelector, TValue>> childBuilder)
     {
         var property = Helper.GetParsingProperty(schemaProperty);
         
@@ -45,7 +47,7 @@ public class HtmlSchemaBuilder<TElement, TModel>
             childBuilder,
             new SetPropertyInfo(property));
         
-        var bindingExpression = new BindObjectExpression<TElement>(
+        var bindingExpression = new BindObjectExpression<TElement, TSelector>(
             typeof(TValue),
             new SetPropertyInfo(property),
             htmlSelector,
@@ -56,18 +58,18 @@ public class HtmlSchemaBuilder<TElement, TModel>
         return this;
     }
 
-    public HtmlSchemaBuilder<TElement, TModel> HasArrayProperty<TValue>(
+    public DocumentSchemaBuilder<TElement, TSelector, TModel> HasArrayProperty<TValue>(
         Expression<Func<TModel, TValue[]?>> schemaProperty,
-        HtmlSelector? htmlSelector,
+        TSelector? selector,
         GetValueDelegate<TElement?, TValue> mapFunction)
     {
         var property = Helper.GetParsingProperty(schemaProperty);
         
-        var bindingExpression = new BindArrayExpression<TElement>(
+        var bindingExpression = new BindArrayExpression<TElement, TSelector>(
             typeof(TValue),
             new SetPropertyInfo(property),
-            htmlSelector,
-            new BindValueExpression<TElement>(
+            selector,
+            new BindValueExpression<TElement, TSelector>(
                 typeof(TValue),
                 new SetPropertyInfo(property),
                 null,
@@ -78,19 +80,19 @@ public class HtmlSchemaBuilder<TElement, TModel>
         return this;
     }
 
-    public HtmlSchemaBuilder<TElement, TModel> HasArrayProperty<TValue>(
-        Expression<Func<TModel, TValue[]?>> schemaProperty,
-        HtmlSelector? htmlSelector,
-        Action<HtmlSchemaBuilder<TElement, TValue>> childBuilder)
+    public DocumentSchemaBuilder<TElement, TSelector, TModel> HasArrayProperty<TValue>(
+        Expression<Func<TModel, IEnumerable<TValue>?>> schemaProperty,
+        TSelector? selector,
+        Action<DocumentSchemaBuilder<TElement, TSelector, TValue>> childBuilder)
     {
         var property = Helper.GetParsingProperty(schemaProperty);
 
         var internalSchema = GetInternalSchema(childBuilder);
         
-        var bindingExpression = new BindArrayExpression<TElement>(
+        var bindingExpression = new BindArrayExpression<TElement, TSelector>(
             typeof(TValue),
             new SetPropertyInfo(property),
-            htmlSelector,
+            selector,
             internalSchema);
         
         BindingExpressions.Add(bindingExpression);
@@ -98,39 +100,39 @@ public class HtmlSchemaBuilder<TElement, TModel>
         return this;
     }
     
-    private BindObjectExpression<TElement> GetInternalSchema<TValue>(
-        Action<HtmlSchemaBuilder<TElement, TValue>> childBuilder,
+    private BindObjectExpression<TElement, TSelector> GetInternalSchema<TValue>(
+        Action<DocumentSchemaBuilder<TElement, TSelector, TValue>> childBuilder,
         SetPropertyInfo? setPropertyInfo = null)
     {
-        var internalSchemaBuilder = new HtmlSchemaBuilder<TElement, TValue>();
+        var internalSchemaBuilder = new DocumentSchemaBuilder<TElement, TSelector, TValue>();
         
         childBuilder(internalSchemaBuilder);
 
-        return new BindObjectExpression<TElement>(
+        return new BindObjectExpression<TElement, TSelector>(
             typeof(TValue),
             setPropertyInfo,
             null,
             internalSchemaBuilder.BindingExpressions.ToArray());
     }
     
-    public HtmlSchemaBuilder<TElement, TModel> BindManually(Func<TElement, IObjectBinder<TModel>, Task> schemaProperty)
+    public DocumentSchemaBuilder<TElement, TSelector, TModel> BindManually(Func<TElement, IObjectBinder<TModel>, Task> schemaProperty)
     {
         BindingExpressions.Add(new ManualBindExpression<TElement, TModel>(schemaProperty));
         
         return this;
     }
     
-    public HtmlSchemaBuilder<TElement, TModel> ExecuteAsync(Func<TElement, Task> function)
+    public DocumentSchemaBuilder<TElement, TSelector, TModel> ExecuteAsync(Func<TElement, Task> function)
     {
         BindingExpressions.Add(new ActionExpression<TElement>(function));
         
         return this;
     }
 
-    public ICompiledHtmlSchema<TElement, TModel> Build()
+    public ICompiledDocumentSchema<TElement, TSelector, TModel> Build()
     {
-        return new CompiledHtmlSchema<TElement, TModel>(
-            new BindObjectExpression<TElement>(
+        return new CompiledDocumentSchema<TElement, TSelector, TModel>(
+            new BindObjectExpression<TElement, TSelector>(
                 typeof(TModel),
                 null,
                 null,

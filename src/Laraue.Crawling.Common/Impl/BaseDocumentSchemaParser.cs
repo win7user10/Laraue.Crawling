@@ -8,27 +8,28 @@ using Microsoft.Extensions.Logging;
 namespace Laraue.Crawling.Common.Impl;
 
 /// <summary>
-/// Base functionality to implement <see cref="IHtmlSchemaParser{TElement}"/>.
+/// Base functionality to implement <see cref="IDocumentSchemaParser{TElement,TSelector}"/>.
 /// </summary>
-/// <typeparam name="TElement"></typeparam>
-public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElement>
+public abstract class BaseDocumentSchemaParser<TElement, TSelector>
+    : IDocumentSchemaParser<TElement, TSelector>
+    where TSelector : Selector
 {
-    private readonly ILogger<BaseHtmlSchemaParser<TElement>> _logger;
+    private readonly ILogger<BaseDocumentSchemaParser<TElement, TSelector>> _logger;
     private readonly ILoggerFactory _loggerFactory;
 
     /// <summary>
-    /// Initializes a new instance of <see cref="BaseHtmlSchemaParser{TElement}"/>.
+    /// Initializes a new instance of <see cref="BaseDocumentSchemaParser{TElement,TSelector}"/>.
     /// </summary>
     /// <param name="loggerFactory"></param>
-    protected BaseHtmlSchemaParser(ILoggerFactory loggerFactory)
+    protected BaseDocumentSchemaParser(ILoggerFactory loggerFactory)
     {
         _loggerFactory = loggerFactory;
-        _logger = loggerFactory.CreateLogger<BaseHtmlSchemaParser<TElement>>();
+        _logger = loggerFactory.CreateLogger<BaseDocumentSchemaParser<TElement, TSelector>>();
     }
 
     /// <inheritdoc />
     public async Task<TModel?> RunAsync<TModel>(
-        ICompiledHtmlSchema<TElement, TModel> schema,
+        ICompiledDocumentSchema<TElement, TSelector, TModel> schema,
         TElement? rootElement)
     {
         var stopWatch = new Stopwatch();
@@ -37,7 +38,7 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
         _logger.LogTrace("Bind started");
         
         var result = (TModel?) await ParseAsync(
-                (BindExpression<TElement>)schema.BindingExpression,
+                (BindExpression<TElement, TSelector>)schema.BindingExpression,
                 rootElement,
                 new VisitorContext())
             .ConfigureAwait(false);
@@ -57,7 +58,10 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
     /// <param name="context"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    private Task<object?> ParseAsync(BindExpression<TElement> bindingExpression, TElement? document, VisitorContext context)
+    private Task<object?> ParseAsync(
+        BindExpression<TElement, TSelector> bindingExpression,
+        TElement? document,
+        VisitorContext context)
     {
         if (document is null)
         {
@@ -74,9 +78,9 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
         {
             return bindingExpression switch
             {
-                BindObjectExpression<TElement> complexType => ParseAsync(complexType, document, childContext),
-                BindArrayExpression<TElement> arrayType => ParseAsync(arrayType, document, childContext),
-                BindValueExpression<TElement> simpleType => ParseAsync(simpleType, document, childContext),
+                BindObjectExpression<TElement, TSelector> complexType => ParseAsync(complexType, document, childContext),
+                BindArrayExpression<TElement, TSelector> arrayType => ParseAsync(arrayType, document, childContext),
+                BindValueExpression<TElement, TSelector> simpleType => ParseAsync(simpleType, document, childContext),
                 _ => throw new InvalidOperationException()
             };
         }
@@ -92,17 +96,17 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
     /// Returns element retrieved from the current element by passed selector.  
     /// </summary>
     /// <param name="currentElement"></param>
-    /// <param name="htmlSelector"></param>
+    /// <param name="selector"></param>
     /// <returns></returns>
-    protected abstract Task<TElement?> GetElementAsync(TElement currentElement, HtmlSelector htmlSelector);
+    protected abstract Task<TElement?> GetElementAsync(TElement currentElement, TSelector selector);
 
-    private async Task<TElement?> GetElementInternalAsync(TElement currentElement, HtmlSelector htmlSelector, VisitorContext context)
+    private async Task<TElement?> GetElementInternalAsync(TElement currentElement, TSelector selector, VisitorContext context)
     {
-        var result = await GetElementAsync(currentElement, htmlSelector).ConfigureAwait(false);
+        var result = await GetElementAsync(currentElement, selector).ConfigureAwait(false);
         
         _logger.LogTrace("Select Property: {Path} Selector: {Selector} Value: {Value}",
             context,
-            htmlSelector,
+            selector,
             result);
 
         return result;
@@ -112,26 +116,26 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
     /// Returns elements retrieved from the current element by passed selector. 
     /// </summary>
     /// <param name="currentElement"></param>
-    /// <param name="htmlSelector"></param>
+    /// <param name="selector"></param>
     /// <returns></returns>
-    protected abstract Task<TElement[]?> GetElementsAsync(TElement currentElement, HtmlSelector htmlSelector);
+    protected abstract Task<TElement[]?> GetElementsAsync(TElement currentElement, TSelector selector);
     
-    private async Task<TElement[]?> GetElementsInternalAsync(TElement currentElement, HtmlSelector htmlSelector, VisitorContext context)
+    private async Task<TElement[]?> GetElementsInternalAsync(TElement currentElement, TSelector selector, VisitorContext context)
     {
-        var result = await GetElementsAsync(currentElement, htmlSelector).ConfigureAwait(false);
+        var result = await GetElementsAsync(currentElement, selector).ConfigureAwait(false);
         
         _logger.LogTrace("Select multiple Property: {Path} Selector: {Selector} Count: {Count}",
             context,
-            htmlSelector,
+            selector,
             result?.Length);
 
         return result;
     }
     
-    private async Task<object?> ParseAsync(BindObjectExpression<TElement> complexType, TElement document, VisitorContext context)
+    private async Task<object?> ParseAsync(BindObjectExpression<TElement, TSelector> complexType, TElement document, VisitorContext context)
     {
-        var intermediateNode = complexType.HtmlSelector is not null
-            ? await GetElementInternalAsync(document,complexType.HtmlSelector.Selector, context).ConfigureAwait(false)
+        var intermediateNode = complexType.Selector is not null
+            ? await GetElementInternalAsync(document, complexType.Selector, context).ConfigureAwait(false)
             : document;
 
         if (intermediateNode is null)
@@ -160,7 +164,7 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
     {
         return schemaExpression switch
         {
-            BindExpression<TElement> bindExpression => ProcessBindExpressionAsync(
+            BindExpression<TElement, TSelector> bindExpression => ProcessBindExpressionAsync(
                 bindExpression,
                 currentElement,
                 objectInstance,
@@ -178,7 +182,7 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
     }
     
     private async Task ProcessBindExpressionAsync(
-        BindExpression<TElement> bindExpression,
+        BindExpression<TElement, TSelector> bindExpression,
         TElement currentElement,
         object objectInstance,
         VisitorContext visitorContext)
@@ -211,15 +215,15 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
     }
 
     private async Task<object?> ParseAsync(
-        BindValueExpression<TElement> simpleType,
+        BindValueExpression<TElement, TSelector> simpleType,
         TElement document,
         VisitorContext context)
     {
         var documentToParse = document;
         
-        if (simpleType.HtmlSelector is not null)
+        if (simpleType.Selector is not null)
         {
-            documentToParse = await GetElementInternalAsync(document, simpleType.HtmlSelector.Selector, context)
+            documentToParse = await GetElementInternalAsync(document, simpleType.Selector, context)
                 .ConfigureAwait(false);
         }
 
@@ -239,14 +243,14 @@ public abstract class BaseHtmlSchemaParser<TElement> : IHtmlSchemaParser<TElemen
     }
     
     private async Task<object?> ParseAsync(
-        BindArrayExpression<TElement> arrayType,
+        BindArrayExpression<TElement, TSelector> arrayType,
         TElement document,
         VisitorContext context)
     {
         TElement[]? children = null;
-        if (arrayType.HtmlSelector is not null)
+        if (arrayType.Selector is not null)
         {
-            children = await GetElementsInternalAsync(document, arrayType.HtmlSelector.Selector, context)
+            children = await GetElementsInternalAsync(document, arrayType.Selector, context)
                 .ConfigureAwait(false);
         }
         
