@@ -39,12 +39,18 @@ public sealed class BrowserFactory : IBrowserFactory
 
             if (_browserInstance is not null)
             {
+                if (!_browserInstance.IsClosed)
+                {
+                    return _browserInstance;
+                }
+                
+                await _browserInstance.DisposeAsync().ConfigureAwait(false);
+                _browserInstance = await GetBrowserInstanceAsync().ConfigureAwait(false);
+
                 return _browserInstance;
             }
             
-            _browserInstance = await Puppeteer
-                .LaunchAsync(_launchOptions, _loggerFactory)
-                .ConfigureAwait(false);
+            _browserInstance = await GetBrowserInstanceAsync().ConfigureAwait(false);
 
             return _browserInstance;
         }
@@ -52,6 +58,11 @@ public sealed class BrowserFactory : IBrowserFactory
         {
             _semaphore.Release();
         }
+    }
+
+    private Task<IBrowser> GetBrowserInstanceAsync()
+    {
+        return Puppeteer.LaunchAsync(_launchOptions, _loggerFactory);
     }
 
     /// <inheritdoc />

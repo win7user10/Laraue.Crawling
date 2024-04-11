@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using Laraue.Crawling.Static.Xml;
@@ -14,19 +15,23 @@ public class XmlParserTests
     public async Task Scheme_ShouldBeParsedCorrectlyAsync()
     {
         var xml = @"
-<note>
-    <to id=""15"">Tove</to>
-    <from>Jani</from>
-    <heading>Reminder</heading>
-    <body>Don't forget me this weekend!</body>
-</note>
+<all>
+    <note>
+        <to id=""15"">Tove</to>
+        <body>Don't forget me this weekend!</body>
+    </note>
+    <note>
+        <to id=""16"">Max</to>
+        <body>Hi!</body>
+    </note>
+</all>
 ";
 
         var schema = new XmlSchemaBuilder<XmlContent>()
             .HasArrayProperty<Note>(x => x.Notes, "//note", builder =>
             {
-                builder.HasProperty(y => y.Body, xPathSelector: "//body");
-                builder.HasProperty(y => y.Id, xPathSelector: "//to", attributeName: "id");
+                builder.HasProperty(y => y.Body, xPathSelector: "body");
+                builder.HasProperty(y => y.Id, xPathSelector: "to", attributeName: "id");
             })
             .Build();
 
@@ -35,10 +40,14 @@ public class XmlParserTests
         xmlDocument.LoadXml(xml);
         
         var result = await parser.RunAsync(schema, xmlDocument);
-        var note = Assert.Single(result!.Notes);
+        Assert.NotEmpty(result!.Notes);
+        var notes = result.Notes.ToArray();
         
-        Assert.Equal("Don't forget me this weekend!", note.Body);
-        Assert.Equal(15, note.Id);
+        Assert.Equal("Don't forget me this weekend!", notes[0].Body);
+        Assert.Equal(15, notes[0].Id);
+        
+        Assert.Equal("Hi!", notes[1].Body);
+        Assert.Equal(16, notes[1].Id);
     }
 
     private sealed record XmlContent
