@@ -9,5 +9,6 @@ namespace Laraue.Crawling.Dynamic.PuppeterSharp;
 /// </summary>
 /// <typeparam name="TModel"></typeparam>
 public class PuppeterSharpSchemaBuilder<TModel> : DocumentSchemaBuilder<IElementHandle, HtmlSelector, TModel>
+    where TModel : class, ICrawlingModel
 {
 }

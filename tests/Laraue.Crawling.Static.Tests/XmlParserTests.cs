@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
+using Laraue.Crawling.Common.Impl;
 using Laraue.Crawling.Static.Xml;
 using Laraue.Crawling.Static.Xml.Extensions;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -50,12 +51,12 @@ public class XmlParserTests
         Assert.Equal(16, notes[1].Id);
     }
 
-    private sealed record XmlContent
+    private sealed record XmlContent : ICrawlingModel
     {
         public IEnumerable<Note> Notes { get; init; }
     }
     
-    private sealed record Note
+    private sealed record Note : ICrawlingModel
     {
         public int Id { get; init; }
         public string Body { get; init; }

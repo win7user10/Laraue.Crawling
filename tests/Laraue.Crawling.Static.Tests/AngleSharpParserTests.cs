@@ -1,5 +1,6 @@
 using System.IO;
 using System.Threading.Tasks;
+using Laraue.Crawling.Common.Impl;
 using Laraue.Crawling.Static.AngleSharp;
 using Laraue.Crawling.Static.AngleSharp.Extensions;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -68,12 +69,12 @@ public class AngleSharpParserTests
     }
 }
 
-public record OnePage
+public record OnePage : ICrawlingModel
 {
     public required string Title { get; init; }
     public required string[] ImageLinks { get; init; }
     public required User User { get; init; }
 }
 
-public record User(string Name, int Age, Dog[] Dogs);
-public record Dog(string Name, int Age, string Identifier);
+public record User(string Name, int Age, Dog[] Dogs) : ICrawlingModel;
+public record Dog(string Name, int Age, string Identifier) : ICrawlingModel;

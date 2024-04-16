@@ -24,6 +24,7 @@ public static class XmlSchemaBuilderExtensions
         Expression<Func<TModel, TValue?>> schemaProperty,
         XPathSelector? xPathSelector = null,
         Func<string, string>? modifyFunc = null)
+        where TModel : class, ICrawlingModel
     {
         return schemaBuilder.HasProperty(
             schemaProperty,
@@ -46,6 +47,7 @@ public static class XmlSchemaBuilderExtensions
         Expression<Func<TModel, TValue?>> schemaProperty,
         XPathSelector? xPathSelector,
         string attributeName)
+        where TModel : class, ICrawlingModel
     {
         return schemaBuilder.HasProperty(
             schemaProperty,

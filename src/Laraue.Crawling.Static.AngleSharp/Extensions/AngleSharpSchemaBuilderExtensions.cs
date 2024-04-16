@@ -24,6 +24,7 @@ public static class AngleSharpSchemaBuilderExtensions
         Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector htmlSelector,
         Func<string, string>? modifyFunc = null)
+        where TModel : class, ICrawlingModel
     {
         return schemaBuilder.HasProperty(
             schemaProperty,

@@ -1,4 +1,5 @@
 ﻿using Laraue.Crawling.Common.Extensions;
+using Laraue.Crawling.Common.Impl;
 using Laraue.Crawling.Dynamic.PuppeterSharp;
 using Microsoft.Extensions.Logging;
 using PuppeteerSharp;
@@ -84,7 +85,7 @@ public sealed class PuppeterSharpParserTests : IAsyncLifetime
     private async Task<TModel> TestAsync<TModel>(
         string htmlTemplate,
         Action<PuppeterSharpSchemaBuilder<TModel>> buildSchema)
-        where TModel : class
+        where TModel : class, ICrawlingModel
     {
         var fullTemplate = $"<html><body>{htmlTemplate}</body></html>";
 
@@ -102,7 +103,7 @@ public sealed class PuppeterSharpParserTests : IAsyncLifetime
         return _page.SetContentAsync(html);
     }
         
-    private sealed class Model
+    private sealed class Model : ICrawlingModel
     {
         public string StringValue { get; init; }
         public long LongValue { get; init; }

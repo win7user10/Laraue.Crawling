@@ -15,6 +15,7 @@ namespace Laraue.Crawling.Common.Impl;
 /// <typeparam name="TModel"></typeparam>
 public class DocumentSchemaBuilder<TElement, TSelector, TModel>
     where TSelector : Selector
+    where TModel : class, ICrawlingModel
 {
     public readonly List<SchemaExpression<TElement>> BindingExpressions = new ();
     
@@ -40,6 +41,7 @@ public class DocumentSchemaBuilder<TElement, TSelector, TModel>
         Expression<Func<TModel, TValue?>> schemaProperty,
         TSelector? htmlSelector,
         Action<DocumentSchemaBuilder<TElement, TSelector, TValue>> childBuilder)
+        where TValue : class, ICrawlingModel
     {
         var property = Helper.GetParsingProperty(schemaProperty);
         
@@ -84,6 +86,7 @@ public class DocumentSchemaBuilder<TElement, TSelector, TModel>
         Expression<Func<TModel, IEnumerable<TValue>?>> schemaProperty,
         TSelector? selector,
         Action<DocumentSchemaBuilder<TElement, TSelector, TValue>> childBuilder)
+        where TValue : class, ICrawlingModel
     {
         var property = Helper.GetParsingProperty(schemaProperty);
 
@@ -103,6 +106,7 @@ public class DocumentSchemaBuilder<TElement, TSelector, TModel>
     private BindObjectExpression<TElement, TSelector> GetInternalSchema<TValue>(
         Action<DocumentSchemaBuilder<TElement, TSelector, TValue>> childBuilder,
         SetPropertyInfo? setPropertyInfo = null)
+        where TValue : class, ICrawlingModel
     {
         var internalSchemaBuilder = new DocumentSchemaBuilder<TElement, TSelector, TValue>();
         

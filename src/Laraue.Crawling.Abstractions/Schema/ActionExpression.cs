@@ -10,7 +10,6 @@ public class ActionExpression<TElement> : SchemaExpression<TElement>
     /// Async delegate to run.
     /// </summary>
     public readonly Func<TElement, Task> AsyncAction;
-
     
     /// <summary>
     /// Initializes a new instance if <see cref="ActionExpression{TElement}"/>.

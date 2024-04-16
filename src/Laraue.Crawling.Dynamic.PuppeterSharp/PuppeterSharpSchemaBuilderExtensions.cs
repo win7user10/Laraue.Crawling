@@ -22,6 +22,7 @@ public static class PuppeterSharpSchemaBuilderExtensions
         Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector? htmlSelector,
         string attributeName)
+        where TModel : class, ICrawlingModel
     {
         return schemaBuilder.HasProperty(
             schemaProperty,
@@ -40,6 +41,7 @@ public static class PuppeterSharpSchemaBuilderExtensions
         HtmlSelector? htmlSelector,
         string attributeName,
         Func<string?, TValue?> getValue)
+        where TModel : class, ICrawlingModel
     {
         return schemaBuilder.HasProperty(
             schemaProperty,
@@ -61,6 +63,7 @@ public static class PuppeterSharpSchemaBuilderExtensions
         Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector? htmlSelector,
         Func<string?, TValue?> getValue)
+        where TModel : class, ICrawlingModel
     {
         return schemaBuilder.HasProperty(
             schemaProperty,
@@ -74,13 +77,14 @@ public static class PuppeterSharpSchemaBuilderExtensions
 
     /// <summary>
     /// Binds the selected property with an inner text of the
-    /// selected element casted to the specified type.
+    /// selected element cast to the specified type.
     /// </summary>
     /// <returns></returns>
     public static DocumentSchemaBuilder<IElementHandle, HtmlSelector, TModel> HasProperty<TModel, TValue>(
         this DocumentSchemaBuilder<IElementHandle, HtmlSelector, TModel> schemaBuilder,
         Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector? htmlSelector)
+        where TModel : class, ICrawlingModel
     {
         return schemaBuilder.HasProperty(
             schemaProperty,
@@ -90,7 +94,7 @@ public static class PuppeterSharpSchemaBuilderExtensions
     
     /// <summary>
     /// Binds the selected property with a value taken from the
-    /// passed async delegate and casted to the specified type.
+    /// passed async delegate and cast to the specified type.
     /// </summary>
     /// <returns></returns>
     public static DocumentSchemaBuilder<IElementHandle, HtmlSelector, TModel> HasProperty<TModel, TValue>(
@@ -98,6 +102,7 @@ public static class PuppeterSharpSchemaBuilderExtensions
         Expression<Func<TModel, TValue?>> schemaProperty,
         HtmlSelector? htmlSelector,
         Func<IElementHandle, Task<string?>> getValueTask)
+        where TModel : class, ICrawlingModel
     {
         return schemaBuilder.HasProperty(
             schemaProperty,
