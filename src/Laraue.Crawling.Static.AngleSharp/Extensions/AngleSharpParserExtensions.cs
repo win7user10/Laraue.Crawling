@@ -18,4 +18,14 @@ public static class AngleSharpParserExtensions
 
         return parser.RunAsync(schema, rootElement);
     }
+    
+    public static Task<TModel?> RunAsync<TModel>(
+        this BaseDocumentSchemaParser<IElement, HtmlSelector> parser,
+        ICompiledElementSchema<IElement, HtmlSelector, TModel> schema,
+        string html)
+    {
+        var rootElement = HtmlParser.ParseDocument(html).Body;
+
+        return parser.RunAsync(schema, rootElement);
+    }
 }

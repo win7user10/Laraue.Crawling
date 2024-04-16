@@ -16,4 +16,8 @@ public interface IDocumentSchemaParser<TElement, TSelector>
     public Task<TModel?> RunAsync<TModel>(
         ICompiledDocumentSchema<TElement, TSelector, TModel> schema,
         TElement? rootElement);
+
+    Task<TModel?> RunAsync<TModel>(
+        ICompiledElementSchema<TElement, TSelector, TModel> schema,
+        TElement? rootElement);
 }

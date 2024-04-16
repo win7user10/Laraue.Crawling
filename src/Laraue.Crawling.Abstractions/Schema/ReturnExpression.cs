@@ -1,15 +1,16 @@
-﻿namespace Laraue.Crawling.Abstractions.Schema;
+﻿using Laraue.Crawling.Abstractions.Schema.Delegates;
 
-public class ReturnExpression<TElement, TModel> : SchemaExpression<TElement>
+namespace Laraue.Crawling.Abstractions.Schema;
+
+public class ReturnExpression<TElement, TSelector> : SchemaExpression<TElement>
+    where TSelector : Selector
 {
-    public readonly Func<TElement, Task<TModel>> ReturnFunction;
+    public TSelector? Selector { get; set; }
+    public GetObjectValueDelegate<TElement> ReturnFunction;
 
-    /// <summary>
-    /// Initializes a new instance if <see cref="ReturnExpression{TElement, TModel}"/>.
-    /// </summary>
-    /// <param name="returnFunction"></param>
-    public ReturnExpression(Func<TElement, Task<TModel>> returnFunction)
+    public ReturnExpression(GetObjectValueDelegate<TElement> returnFunction, TSelector? selector)
     {
+        Selector = selector;
         ReturnFunction = returnFunction;
     }
 }

@@ -1,5 +1,6 @@
 using System.IO;
 using System.Threading.Tasks;
+using Laraue.Crawling.Abstractions;
 using Laraue.Crawling.Common.Impl;
 using Laraue.Crawling.Static.AngleSharp;
 using Laraue.Crawling.Static.AngleSharp.Extensions;
@@ -66,6 +67,20 @@ public class AngleSharpParserTests
         Assert.Equal(2, links.Length);
         Assert.Equal("https://hey1.html", links[0]);
         Assert.Equal("https://hey2.html", links[1]);
+    }
+    
+    [Fact]
+    public async Task Scheme_ShouldBeParsedCorrectly()
+    {
+        var schema = new AngleSharpElementSchemaBuilder<string>()
+            .HasValue(e => Task.FromResult(e.InnerHtml), "asd");
+
+        var visitor = new AngleSharpParser(new NullLoggerFactory());
+
+        var html = await File.ReadAllTextAsync("test.html");
+        var model = await visitor.RunAsync(schema, html)!;
+        
+        Assert.Equal("asd", model);
     }
 }
 

@@ -49,7 +49,27 @@ public abstract class BaseDocumentSchemaParser<TElement, TSelector>
 
         return result;
     }
-    
+
+    public async Task<TModel?> RunAsync<TModel>(ICompiledElementSchema<TElement, TSelector, TModel> schema, TElement? rootElement)
+    {
+        var stopWatch = new Stopwatch();
+        stopWatch.Start();
+        
+        _logger.LogTrace("Bind started");
+        
+        var result = (TModel?) await ParseAsync(
+                schema.BindingExpression,
+                rootElement,
+                new VisitorContext())
+            .ConfigureAwait(false);
+        
+        stopWatch.Stop();
+        
+        _logger.LogDebug("Bind finished for {Time}", stopWatch.Elapsed);
+
+        return result;
+    }
+
     /// <summary>
     /// Method for routing between all possible parsing expressions.
     /// </summary>
@@ -240,6 +260,14 @@ public abstract class BaseDocumentSchemaParser<TElement, TSelector>
         {
             throw new InvalidCastException($"The property {context} could not be parsed", e);
         }
+    }
+    
+    private async Task<object?> ParseAsync(
+        ReturnExpression<TElement, TSelector> returnExpression,
+        TElement? document,
+        VisitorContext context)
+    {
+        return await returnExpression.ReturnFunction.Invoke(document);
     }
     
     private async Task<object?> ParseAsync(
