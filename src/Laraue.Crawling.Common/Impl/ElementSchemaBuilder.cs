@@ -1,27 +1,18 @@
 ﻿using Laraue.Crawling.Abstractions;
-using Laraue.Crawling.Abstractions.Schema;
 
 namespace Laraue.Crawling.Common.Impl;
 
-public class ElementSchemaBuilder<TElement, TSelector, TModel>
+public abstract class ElementSchema<TElement, TSelector, TModel> : ICompiledElementSchema<TElement, TSelector, TModel>
     where TSelector : Selector
 {
-    public ICompiledElementSchema<TElement, TSelector, TModel> HasValue(Func<TElement, Task<TModel>> function, TSelector selector)
-    {
-        return new ElementSchema<TElement, TSelector, TModel>(
-            new ReturnExpression<TElement, TSelector>(
-                async element => await function.Invoke(element).ConfigureAwait(false),
-                selector));
-    }
-}
+    public ICompiledDocumentSchema<TElement, TSelector, GenericResponse<TModel>> ObjectSchema { get; }
 
-public class ElementSchema<TElement, TSelector, TModel> : ICompiledElementSchema<TElement, TSelector, TModel>
-    where TSelector : Selector
-{
-    public ElementSchema(ReturnExpression<TElement, TSelector> bindingExpression)
+    protected ElementSchema(
+        DocumentSchemaBuilder<TElement, TSelector, GenericResponse<TModel>> schemaBuilder,
+        Action<PropertyBuilder<TElement, TSelector, GenericResponse<TModel>, TModel>> propertyBuilder)
     {
-        BindingExpression = bindingExpression;
-    }
+        schemaBuilder.HasProperty(x => x.Value, propertyBuilder);
 
-    public ReturnExpression<TElement, TSelector> BindingExpression { get; }
+        ObjectSchema = schemaBuilder.Build();
+    }
 }

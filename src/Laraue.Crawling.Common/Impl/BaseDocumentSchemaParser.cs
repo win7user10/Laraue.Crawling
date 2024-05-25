@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Text.Json;
 using Laraue.Crawling.Abstractions;
 using Laraue.Crawling.Abstractions.Schema;
 using Laraue.Crawling.Abstractions.Schema.Binding;
@@ -50,24 +49,12 @@ public abstract class BaseDocumentSchemaParser<TElement, TSelector>
         return result;
     }
 
+    /// <inheritdoc />
     public async Task<TModel?> RunAsync<TModel>(ICompiledElementSchema<TElement, TSelector, TModel> schema, TElement? rootElement)
     {
-        var stopWatch = new Stopwatch();
-        stopWatch.Start();
-        
-        _logger.LogTrace("Bind started");
-        
-        var result = (TModel?) await ParseAsync(
-                schema.BindingExpression,
-                rootElement,
-                new VisitorContext())
-            .ConfigureAwait(false);
-        
-        stopWatch.Stop();
-        
-        _logger.LogDebug("Bind finished for {Time}", stopWatch.Elapsed);
+        var result = await RunAsync(schema.ObjectSchema, rootElement).ConfigureAwait(false);
 
-        return result;
+        return result.Value;
     }
 
     /// <summary>
@@ -256,17 +243,21 @@ public abstract class BaseDocumentSchemaParser<TElement, TSelector>
         {
             return await simpleType.PropertyGetter(documentToParse).ConfigureAwait(false);
         }
-        catch (JsonException e)
+        catch (Exception e)
         {
-            throw new InvalidCastException($"The property {context} could not be parsed", e);
+            throw new InvalidOperationException($"The property '{context}' could not be parsed: {e.Message}", e);
         }
     }
     
-    private async Task<object?> ParseAsync(
+    private static async Task<object?> ParseAsync(
         ReturnExpression<TElement, TSelector> returnExpression,
-        TElement? document,
-        VisitorContext context)
+        TElement? document)
     {
+        if (document is null)
+        {
+            return null;
+        }
+        
         return await returnExpression.ReturnFunction.Invoke(document);
     }
     
@@ -287,7 +278,7 @@ public abstract class BaseDocumentSchemaParser<TElement, TSelector>
             return null;
         }
 
-        var result = (object?[])Array.CreateInstance(arrayType.ObjectType, children.Length);
+        var result = Array.CreateInstance(arrayType.ObjectType, children.Length);
 
         for (var i = 0; i < children.Length; i++)
         {
@@ -295,7 +286,7 @@ public abstract class BaseDocumentSchemaParser<TElement, TSelector>
             
             var child = children[i];
             var value = await ParseAsync(arrayType.Element, child, childContext).ConfigureAwait(false);
-            result[i] = value;
+            result.SetValue(value, i);
         }
         
         return result;

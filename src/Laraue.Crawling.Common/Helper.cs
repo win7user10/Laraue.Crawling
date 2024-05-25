@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -42,5 +43,35 @@ public class Helper
 
         var property = propertyExpression.Member as PropertyInfo;
         return property ?? throw new NotImplementedException();
+    }
+
+    public static bool TryGetArrayDefinition(Type type, [NotNullWhen(true)] out Type? arrayType)
+    {
+        if (type == typeof(string))
+        {
+            arrayType = null;
+            return false;
+        }
+        
+        if (type is { IsInterface: true, IsGenericType: true }
+            && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+        {
+            arrayType = type.GetGenericArguments()[0];
+            return true;
+        }
+        
+        foreach(var iType in type.GetInterfaces())
+        {
+            if (!iType.IsGenericType || iType.GetGenericTypeDefinition() != typeof(IEnumerable<>))
+            {
+                continue;
+            }
+            
+            arrayType = iType.GetGenericArguments()[0];
+            return true;
+        }
+
+        arrayType = null;
+        return false;
     }
 }

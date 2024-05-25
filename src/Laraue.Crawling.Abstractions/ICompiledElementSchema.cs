@@ -1,6 +1,4 @@
-﻿using Laraue.Crawling.Abstractions.Schema;
-
-namespace Laraue.Crawling.Abstractions;
+﻿namespace Laraue.Crawling.Abstractions;
 
 /// <summary>
 /// Schema ready for the crawling.
@@ -14,5 +12,10 @@ public interface ICompiledElementSchema<TElement, TSelector, TModel>
     /// <summary>
     /// Schema of the parsing for the current object.
     /// </summary>
-    public ReturnExpression<TElement, TSelector> BindingExpression { get; }
+    public ICompiledDocumentSchema<TElement, TSelector, GenericResponse<TModel>> ObjectSchema { get; }
+}
+
+public class GenericResponse<T> : ICrawlingModel
+{
+    public T? Value { get; set; }
 }

@@ -2,9 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
-using Laraue.Crawling.Common.Impl;
+using Laraue.Crawling.Abstractions;
 using Laraue.Crawling.Static.Xml;
-using Laraue.Crawling.Static.Xml.Extensions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
@@ -31,8 +30,11 @@ public class XmlParserTests
         var schema = new XmlSchemaBuilder<XmlContent>()
             .HasArrayProperty<Note>(x => x.Notes, "//note", builder =>
             {
-                builder.HasProperty(y => y.Body, xPathSelector: "body");
-                builder.HasProperty(y => y.Id, xPathSelector: "to", attributeName: "id");
+                builder.HasProperty(y => y.Body, b => b
+                    .UseSelector("body"));
+                builder.HasProperty(y => y.Id, b => b
+                    .UseSelector("to")
+                    .GetInnerTextFromAttribute("id"));
             })
             .Build();
 

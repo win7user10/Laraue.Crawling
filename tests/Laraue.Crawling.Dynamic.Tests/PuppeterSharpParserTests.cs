@@ -1,5 +1,5 @@
-﻿using Laraue.Crawling.Common.Extensions;
-using Laraue.Crawling.Common.Impl;
+﻿using Laraue.Crawling.Abstractions;
+using Laraue.Crawling.Common.Extensions;
 using Laraue.Crawling.Dynamic.PuppeterSharp;
 using Microsoft.Extensions.Logging;
 using PuppeteerSharp;
@@ -30,8 +30,10 @@ public sealed class PuppeterSharpParserTests : IAsyncLifetime
     {
         var model = await TestAsync<Model>(
             htmlTemplate: "<meta itemprop=price content=11500000></meta>",
-            builder => builder
-                .HasProperty(x => x.StringValue,  htmlSelector: "meta[itemprop=price]", attributeName: "content"));
+            schema => schema
+                .HasProperty(x => x.StringValue, propertyBuilder => propertyBuilder
+                    .UseSelector("meta[itemprop=price]")
+                    .GetInnerTextFromAttribute("content")));
         
         Assert.Equal("11500000", model.StringValue);
     }
@@ -42,7 +44,9 @@ public sealed class PuppeterSharpParserTests : IAsyncLifetime
         var model = await TestAsync<Model>(
             htmlTemplate: "<meta itemprop=price content=11500000></meta>",
             builder => builder
-                .HasProperty(x => x.LongValue,  htmlSelector: "meta[itemprop=price]", attributeName: "content"));
+                .HasProperty(x => x.LongValue, propertyBuilder => propertyBuilder
+                    .UseSelector("meta[itemprop=price]")
+                    .GetInnerTextFromAttribute("content")));
         
         Assert.Equal(11500000, model.LongValue);
     }
@@ -53,11 +57,10 @@ public sealed class PuppeterSharpParserTests : IAsyncLifetime
         var model = await TestAsync<Model>(
             htmlTemplate: "<meta itemprop=price content=11500000RUB></meta>",
             builder => builder
-                .HasProperty(
-                    x => x.LongValue,
-                    htmlSelector: "meta[itemprop=price]",
-                    attributeName: "content",
-                    getValue: s => long.Parse(s.GetOnlyDigits())));
+                .HasProperty(x => x.LongValue, propertyBuilder => propertyBuilder
+                    .UseSelector("meta[itemprop=price]")
+                    .GetInnerTextFromAttribute("content")
+                    .Map(e => e.GetLongOrDefault())));
         
         Assert.Equal(11500000, model.LongValue);
     }
@@ -75,8 +78,7 @@ public sealed class PuppeterSharpParserTests : IAsyncLifetime
                     {
                         childBuilder.HasProperty(
                             x => x.StringValue,
-                            htmlSelector: null,
-                            attributeName: "content");
+                            propertyBuilder => propertyBuilder.GetInnerTextFromAttribute("content"));
                     }));
         
         Assert.Equal("11500000", model.ChildValue.StringValue);

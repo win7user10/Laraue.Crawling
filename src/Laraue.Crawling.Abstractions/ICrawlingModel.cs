@@ -1,4 +1,4 @@
-﻿namespace Laraue.Crawling.Common.Impl;
+﻿namespace Laraue.Crawling.Abstractions;
 
 /// <summary>
 /// Mark interface for all crawling models.
