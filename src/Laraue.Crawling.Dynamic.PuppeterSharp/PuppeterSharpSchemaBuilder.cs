@@ -11,8 +11,9 @@ namespace Laraue.Crawling.Dynamic.PuppeterSharp;
 public class PuppeterSharpSchemaBuilder<TModel> : DocumentSchemaBuilder<IElementHandle, HtmlSelector, TModel>
     where TModel : class, ICrawlingModel
 {
+    /// <inheritdoc />
     public PuppeterSharpSchemaBuilder()
-        : base(new PuppeterPropertyBuilderFactory())
+        : base(new PuppeterSharpPropertyBuilderFactory())
     {
     }
 }

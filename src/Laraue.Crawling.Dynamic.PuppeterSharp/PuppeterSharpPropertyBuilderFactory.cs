@@ -3,27 +3,33 @@ using PuppeteerSharp;
 
 namespace Laraue.Crawling.Dynamic.PuppeterSharp;
 
-public class PuppeterPropertyBuilderFactory : PropertyBuilderFactory<IElementHandle>
+/// <inheritdoc />
+public class PuppeterSharpPropertyBuilderFactory : PropertyBuilderFactory<IElementHandle>
 {
-    public PuppeterPropertyBuilderFactory()
+    /// <inheritdoc />
+    public PuppeterSharpPropertyBuilderFactory()
         : base(new PuppeterSharpCrawlingAdapter(new JsonValueMapper()))
     {
     }
 }
 
+/// <inheritdoc />
 public class PuppeterSharpCrawlingAdapter : BaseCrawlingAdapter<IElementHandle>
 {
+    /// <inheritdoc />
     public PuppeterSharpCrawlingAdapter(ValueMapper valueMapper)
         : base(valueMapper)
     {
     }
 
-    public override Task<string?> GetInnerTextAsync(IElementHandle element)
+    /// <inheritdoc />
+    public override Task<string?> GetInnerTextAsync(IElementHandle? element)
     {
         return element.GetInnerTextAsync();
     }
 
-    public override Task<string?> GetAttributeTextAsync(IElementHandle element, string attributeName)
+    /// <inheritdoc />
+    public override Task<string?> GetAttributeTextAsync(IElementHandle? element, string attributeName)
     {
         return element.GetAttributeValueAsync(attributeName);
     }
