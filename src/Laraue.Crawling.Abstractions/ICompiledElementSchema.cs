@@ -12,10 +12,5 @@ public interface ICompiledElementSchema<TElement, TSelector, TModel>
     /// <summary>
     /// Schema of the parsing for the current object.
     /// </summary>
-    public ICompiledDocumentSchema<TElement, TSelector, GenericResponse<TModel>> ObjectSchema { get; }
-}
-
-public class GenericResponse<T> : ICrawlingModel
-{
-    public T? Value { get; set; }
+    public ICompiledDocumentSchema<TElement, TSelector, GenericCrawlingModel<TModel>> ObjectSchema { get; }
 }

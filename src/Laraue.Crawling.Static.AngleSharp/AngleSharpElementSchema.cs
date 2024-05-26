@@ -8,8 +8,8 @@ namespace Laraue.Crawling.Static.AngleSharp;
 public class AngleSharpElementSchema<TModel> : ElementSchema<IElement, HtmlSelector, TModel?>
 {
     /// <inheritdoc />
-    public AngleSharpElementSchema(Action<PropertyBuilder<IElement, HtmlSelector, GenericResponse<TModel?>, TModel?>> propertyBuilder)
-        : base(new AngleSharpSchemaBuilder<GenericResponse<TModel?>>(), propertyBuilder)
+    public AngleSharpElementSchema(Action<PropertyBuilder<IElement, HtmlSelector, GenericCrawlingModel<TModel?>, TModel?>> propertyBuilder)
+        : base(new AngleSharpSchemaBuilder<GenericCrawlingModel<TModel?>>(), propertyBuilder)
     {
     }
 }

@@ -8,8 +8,8 @@ namespace Laraue.Crawling.Dynamic.PuppeterSharp;
 public class PuppeterSharpElementSchema<TModel> : ElementSchema<IElementHandle, HtmlSelector, TModel?>
 {
     /// <inheritdoc />
-    public PuppeterSharpElementSchema(Action<PropertyBuilder<IElementHandle, HtmlSelector, GenericResponse<TModel?>, TModel?>> propertyBuilder)
-        : base(new PuppeterSharpSchemaBuilder<GenericResponse<TModel?>>(), propertyBuilder)
+    public PuppeterSharpElementSchema(Action<PropertyBuilder<IElementHandle, HtmlSelector, GenericCrawlingModel<TModel?>, TModel?>> propertyBuilder)
+        : base(new PuppeterSharpSchemaBuilder<GenericCrawlingModel<TModel?>>(), propertyBuilder)
     {
     }
 }
