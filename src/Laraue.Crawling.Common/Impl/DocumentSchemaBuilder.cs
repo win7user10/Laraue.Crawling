@@ -53,7 +53,7 @@ public class DocumentSchemaBuilder<TElement, TSelector, TModel>
                     arrayType,
                     new SetPropertyInfo(property),
                     selector: null,
-                    async element => await propertyBuilder.Extractors.GetValueAsync(element, arrayType)));
+                    async element => await propertyBuilder.CrawlingAdapter.GetValueAsync(element, arrayType)));
         }
         else
         {

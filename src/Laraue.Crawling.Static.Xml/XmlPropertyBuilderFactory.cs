@@ -6,14 +6,14 @@ namespace Laraue.Crawling.Static.Xml;
 public class XmlPropertyBuilderFactory : PropertyBuilderFactory<XmlNode>
 {
     public XmlPropertyBuilderFactory()
-        : base(new XmlExtractors(new JsonValueMapper()))
+        : base(new XmlCrawlingAdapter(new JsonValueMapper()))
     {
     }
 }
 
-public class XmlExtractors : BaseExtractors<XmlNode>
+public class XmlCrawlingAdapter : BaseCrawlingAdapter<XmlNode>
 {
-    public XmlExtractors(ValueMapper valueMapper) : base(valueMapper)
+    public XmlCrawlingAdapter(ValueMapper valueMapper) : base(valueMapper)
     {
     }
 

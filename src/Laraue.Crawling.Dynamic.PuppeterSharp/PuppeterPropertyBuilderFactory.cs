@@ -6,14 +6,14 @@ namespace Laraue.Crawling.Dynamic.PuppeterSharp;
 public class PuppeterPropertyBuilderFactory : PropertyBuilderFactory<IElementHandle>
 {
     public PuppeterPropertyBuilderFactory()
-        : base(new PuppeterSharpExtractors(new JsonValueMapper()))
+        : base(new PuppeterSharpCrawlingAdapter(new JsonValueMapper()))
     {
     }
 }
 
-public class PuppeterSharpExtractors : BaseExtractors<IElementHandle>
+public class PuppeterSharpCrawlingAdapter : BaseCrawlingAdapter<IElementHandle>
 {
-    public PuppeterSharpExtractors(ValueMapper valueMapper)
+    public PuppeterSharpCrawlingAdapter(ValueMapper valueMapper)
         : base(valueMapper)
     {
     }

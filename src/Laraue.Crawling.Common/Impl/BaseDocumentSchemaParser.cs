@@ -249,18 +249,6 @@ public abstract class BaseDocumentSchemaParser<TElement, TSelector>
         }
     }
     
-    private static async Task<object?> ParseAsync(
-        ReturnExpression<TElement, TSelector> returnExpression,
-        TElement? document)
-    {
-        if (document is null)
-        {
-            return null;
-        }
-        
-        return await returnExpression.ReturnFunction.Invoke(document);
-    }
-    
     private async Task<object?> ParseAsync(
         BindArrayExpression<TElement, TSelector> arrayType,
         TElement document,

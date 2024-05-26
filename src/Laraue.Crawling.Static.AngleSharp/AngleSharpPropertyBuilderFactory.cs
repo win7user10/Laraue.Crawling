@@ -3,27 +3,33 @@ using Laraue.Crawling.Common.Impl;
 
 namespace Laraue.Crawling.Static.AngleSharp;
 
+/// <inheritdoc />
 public class AngleSharpPropertyBuilderFactory : PropertyBuilderFactory<IElement>
 {
+    /// <inheritdoc />
     public AngleSharpPropertyBuilderFactory()
-        : base(new AngleSharpExtractors(new JsonValueMapper()))
+        : base(new AngleSharpCrawlingAdapter(new JsonValueMapper()))
     {
     }
 }
 
-public class AngleSharpExtractors : BaseExtractors<IElement>
+/// <inheritdoc />
+public class AngleSharpCrawlingAdapter : BaseCrawlingAdapter<IElement>
 {
-    public AngleSharpExtractors(ValueMapper valueMapper) : base(valueMapper)
+    /// <inheritdoc />
+    public AngleSharpCrawlingAdapter(ValueMapper valueMapper) : base(valueMapper)
     {
     }
 
-    public override Task<string?> GetInnerTextAsync(IElement element)
+    /// <inheritdoc />
+    public override Task<string?> GetInnerTextAsync(IElement? element)
     {
-        return Task.FromResult((string?) element.TextContent);
+        return Task.FromResult(element?.TextContent);
     }
 
-    public override Task<string?> GetAttributeTextAsync(IElement element, string attributeName)
+    /// <inheritdoc />
+    public override Task<string?> GetAttributeTextAsync(IElement? element, string attributeName)
     {
-        return Task.FromResult(element.GetAttribute(attributeName));
+        return Task.FromResult(element?.GetAttribute(attributeName));
     }
 }
