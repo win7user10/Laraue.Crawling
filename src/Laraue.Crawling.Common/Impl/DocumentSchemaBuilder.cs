@@ -15,21 +15,54 @@ namespace Laraue.Crawling.Common.Impl;
 /// <typeparam name="TModel"></typeparam>
 public class DocumentSchemaBuilder<TElement, TSelector, TModel>
     where TSelector : Selector
+    where TModel : class, ICrawlingModel
 {
+    private readonly PropertyBuilderFactory<TElement> _propertyBuilderFactory;
     public readonly List<SchemaExpression<TElement>> BindingExpressions = new ();
+
+    public DocumentSchemaBuilder(PropertyBuilderFactory<TElement> propertyBuilderFactory)
+    {
+        _propertyBuilderFactory = propertyBuilderFactory;
+    }
+
+    public DocumentSchemaBuilder<TElement, TSelector, TModel> HasProperty<TValue>(
+        Expression<Func<TModel, TValue?>> schemaProperty,
+        TSelector selector)
+    {
+        return HasProperty(schemaProperty, builder => builder.UseSelector(selector));
+    }
     
     public DocumentSchemaBuilder<TElement, TSelector, TModel> HasProperty<TValue>(
         Expression<Func<TModel, TValue?>> schemaProperty,
-        TSelector? htmlSelector,
-        GetValueDelegate<TElement, TValue> getValueDelegate)
+        Action<PropertyBuilder<TElement, TSelector, TModel, TValue>> setupPropertyBuilder)
     {
-        var property = Helper.GetParsingProperty(schemaProperty);
+        var propertyBuilder = _propertyBuilderFactory.GetPropertyBuilder<TSelector, TModel, TValue>();
         
-        var bindingExpression = new BindValueExpression<TElement, TSelector>(
-            typeof(TValue),
-            new SetPropertyInfo(property),
-            htmlSelector,
-            async element => await getValueDelegate.Invoke(element).ConfigureAwait(false));
+        setupPropertyBuilder(propertyBuilder);
+        
+        var property = Helper.GetParsingProperty(schemaProperty);
+
+        SchemaExpression<TElement> bindingExpression;
+        if (Helper.TryGetArrayDefinition(typeof(TValue), out var arrayType))
+        {
+            bindingExpression = new BindArrayExpression<TElement, TSelector>(
+                arrayType,
+                new SetPropertyInfo(property),
+                propertyBuilder.Selector,
+                new BindValueExpression<TElement, TSelector>(
+                    arrayType,
+                    new SetPropertyInfo(property),
+                    selector: null,
+                    async element => await propertyBuilder.CrawlingAdapter.GetValueAsync(element, arrayType)));
+        }
+        else
+        {
+            bindingExpression = new BindValueExpression<TElement, TSelector>(
+                typeof(TValue),
+                new SetPropertyInfo(property),
+                propertyBuilder.Selector,
+                async element => await propertyBuilder.GetValueAsyncDelegate.Invoke(element).ConfigureAwait(false));
+        }
         
         BindingExpressions.Add(bindingExpression);
 
@@ -40,10 +73,11 @@ public class DocumentSchemaBuilder<TElement, TSelector, TModel>
         Expression<Func<TModel, TValue?>> schemaProperty,
         TSelector? htmlSelector,
         Action<DocumentSchemaBuilder<TElement, TSelector, TValue>> childBuilder)
+        where TValue : class, ICrawlingModel
     {
         var property = Helper.GetParsingProperty(schemaProperty);
         
-        var internalSchema = GetInternalSchema(
+        var internalSchema = GetInternalSchema<TValue>(
             childBuilder,
             new SetPropertyInfo(property));
         
@@ -61,7 +95,7 @@ public class DocumentSchemaBuilder<TElement, TSelector, TModel>
     public DocumentSchemaBuilder<TElement, TSelector, TModel> HasArrayProperty<TValue>(
         Expression<Func<TModel, TValue[]?>> schemaProperty,
         TSelector? selector,
-        GetValueDelegate<TElement?, TValue> mapFunction)
+        GetValueAsyncDelegate<TElement?, TValue> mapFunction)
     {
         var property = Helper.GetParsingProperty(schemaProperty);
         
@@ -84,6 +118,7 @@ public class DocumentSchemaBuilder<TElement, TSelector, TModel>
         Expression<Func<TModel, IEnumerable<TValue>?>> schemaProperty,
         TSelector? selector,
         Action<DocumentSchemaBuilder<TElement, TSelector, TValue>> childBuilder)
+        where TValue : class, ICrawlingModel
     {
         var property = Helper.GetParsingProperty(schemaProperty);
 
@@ -103,8 +138,9 @@ public class DocumentSchemaBuilder<TElement, TSelector, TModel>
     private BindObjectExpression<TElement, TSelector> GetInternalSchema<TValue>(
         Action<DocumentSchemaBuilder<TElement, TSelector, TValue>> childBuilder,
         SetPropertyInfo? setPropertyInfo = null)
+        where TValue : class, ICrawlingModel
     {
-        var internalSchemaBuilder = new DocumentSchemaBuilder<TElement, TSelector, TValue>();
+        var internalSchemaBuilder = new DocumentSchemaBuilder<TElement, TSelector, TValue>(_propertyBuilderFactory);
         
         childBuilder(internalSchemaBuilder);
 

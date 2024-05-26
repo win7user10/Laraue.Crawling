@@ -6,7 +6,7 @@
 /// </summary>
 /// <typeparam name="TElement"></typeparam>
 /// <typeparam name="TValue"></typeparam>
-public delegate Task<TValue?> GetValueDelegate<in TElement, TValue>(TElement element);
+public delegate Task<TValue?> GetValueAsyncDelegate<in TElement, TValue>(TElement element);
 
 /// <summary>
 /// Expression to return object value

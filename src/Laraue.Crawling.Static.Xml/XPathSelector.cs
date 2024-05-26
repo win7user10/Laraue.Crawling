@@ -1,7 +1,11 @@
-﻿namespace Laraue.Crawling.Abstractions;
+﻿using Laraue.Crawling.Abstractions;
 
+namespace Laraue.Crawling.Static.Xml;
+
+/// <inheritdoc />
 public record XPathSelector : Selector
 {
+    /// <inheritdoc />
     public XPathSelector(string value)
         : base(value)
     {

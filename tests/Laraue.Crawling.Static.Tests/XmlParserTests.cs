@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
+using Laraue.Crawling.Abstractions;
 using Laraue.Crawling.Static.Xml;
-using Laraue.Crawling.Static.Xml.Extensions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
@@ -30,8 +30,11 @@ public class XmlParserTests
         var schema = new XmlSchemaBuilder<XmlContent>()
             .HasArrayProperty<Note>(x => x.Notes, "//note", builder =>
             {
-                builder.HasProperty(y => y.Body, xPathSelector: "body");
-                builder.HasProperty(y => y.Id, xPathSelector: "to", attributeName: "id");
+                builder.HasProperty(y => y.Body, b => b
+                    .UseSelector("body"));
+                builder.HasProperty(y => y.Id, b => b
+                    .UseSelector("to")
+                    .GetInnerTextFromAttribute("id"));
             })
             .Build();
 
@@ -50,12 +53,12 @@ public class XmlParserTests
         Assert.Equal(16, notes[1].Id);
     }
 
-    private sealed record XmlContent
+    private sealed record XmlContent : ICrawlingModel
     {
         public IEnumerable<Note> Notes { get; init; }
     }
     
-    private sealed record Note
+    private sealed record Note : ICrawlingModel
     {
         public int Id { get; init; }
         public string Body { get; init; }

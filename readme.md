@@ -2,13 +2,13 @@
 
 The set of tools for fast writing crawlers on .NET.
 
-### Static crawling
+### Static HTML crawling
 
 Static means the crawling process is performing with the static html that not changes.
-You can build a strongly typed schema with binding binding each element to related html block.
+You can build a strongly typed schema with binding each element to related html block.
 Then this schema can be parsed via AngleSharpParser class located in Laraue.Crawling.Static.AngleSharp library.
 
-#### Build static schema
+#### Build static HTML schema
 
 ```html
 <div>
@@ -59,7 +59,7 @@ public record Dog(string Name, int Age);
     .Build();
 ```
 
-#### Using of the static schema for parsing of the passed html
+#### Using of the static schema to parse the passed html
 
 ```csharp
 var parser = new AngleSharpParser(new NullLoggerFactory());
@@ -88,7 +88,23 @@ Assert.Equal("https://hey1.html", links[0]);
 Assert.Equal("https://hey2.html", links[1]);
 ```
 
-### Dynamic crawling
+#### Element schema
+
+Sometimes the full schema binding is not necessary (only one value is required). Then the element schema class can be used.
+
+```csharp
+var dogNamesSchema = new AngleSharpElementSchema<string[]>(builder => builder.UseSelector(".dog .name"));
+
+var parser = new AngleSharpParser(new NullLoggerFactory());
+var html = await File.ReadAllTextAsync("test.html");
+var dogNames = await parser.RunAsync(schema, html);
+
+Assert.Equal(2, dogNames.Length);
+Assert.Equal("Jelly", dogNames[0]);
+Assert.Equal("Marly", dogNames[1]);
+```
+
+### Dynamic HTML crawling
 
 The package Laraue.Crawling.Dynamic.PuppeterSharp intended to parse schemas using PuppeterSharp library.
 Let's rewrite static schema to the dynamic format:
@@ -153,4 +169,51 @@ var schema = new PuppeterSharpSchemaBuilder<User>()
         modelBinder.BindProperty(x => x.Surname, stringParts[1]);
         modelBinder.BindProperty(x => x.Age, int.Parse(stringParts[2]));
     })
+```
+
+### XML static crawling
+
+```xml
+<all>
+    <note>
+        <to id="15">Tove</to>
+        <body>Don't forget me this weekend!</body>
+    </note>
+    <note>
+        <to id="16">Max</to>
+        <body>Hi!</body>
+    </note>
+</all>
+```
+
+Use class XmlSchemaBuilder to build the schema. 
+
+```csharp
+var schema = new XmlSchemaBuilder<XmlContent>()
+    .HasArrayProperty<Note>(x => x.Notes, "//note", builder =>
+    {
+        builder.HasProperty(y => y.Body, b => b.UseSelector("body"));
+        builder.HasProperty(y => y.Id, b => b
+            .UseSelector("to")
+            .GetInnerTextFromAttribute("id"));
+    })
+    .Build();
+```
+
+Schema parsing
+```csharp
+var parser = new XmlParser(new NullLoggerFactory());
+var xmlDocument = new XmlDocument();
+xmlDocument.LoadXml(xml);
+        
+var result = await parser.RunAsync(schema, xmlDocument);
+
+Assert.NotEmpty(result!.Notes);
+var notes = result.Notes.ToArray();
+
+Assert.Equal("Don't forget me this weekend!", notes[0].Body);
+Assert.Equal(15, notes[0].Id);
+
+Assert.Equal("Hi!", notes[1].Body);
+Assert.Equal(16, notes[1].Id);
 ```
