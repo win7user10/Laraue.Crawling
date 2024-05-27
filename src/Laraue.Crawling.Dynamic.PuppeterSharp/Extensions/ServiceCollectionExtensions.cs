@@ -24,7 +24,6 @@ public static class ServiceCollectionExtensions
     {
         return serviceCollection
             .AddSingleton<IBrowserFactory>(sp => new BrowserFactory(launchOptions, sp.GetRequiredService<ILoggerFactory>()))
-            .AddSingleton<IDocumentSchemaParser<IElementHandle, HtmlSelector>, PuppeterSharpParser>()
-            .AddSingleton<IPageParser, PageParser>();
+            .AddSingleton<IDocumentSchemaParser<IElementHandle, HtmlSelector>, PuppeterSharpParser>();
     }
 }
