@@ -2,6 +2,10 @@
 
 The set of tools for fast writing crawlers on .NET.
 
+
+[![latest version](https://img.shields.io/nuget/v/Laraue.Crawling.Common)](https://www.nuget.org/packages/Laraue.Crawling.Common)
+[![latest version](https://img.shields.io/nuget/dt/Laraue.Crawling.Common)](https://www.nuget.org/packages/Laraue.Crawling.Common)
+
 ### Static HTML crawling
 
 Static means the crawling process is performing with the static html that not changes.
