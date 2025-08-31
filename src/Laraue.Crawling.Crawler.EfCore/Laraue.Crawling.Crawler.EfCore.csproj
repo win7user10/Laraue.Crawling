@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <Description>The set of classes to write a program for a data crawling with state in DB.</Description>
         <RepositoryType>git</RepositoryType>
         <Authors>Belyanskiy Ilya</Authors>
@@ -12,8 +12,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Laraue.Core.Extensions.Hosting.EfCore" Version="7.2.4" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+        <PackageReference Include="Laraue.Core.Extensions.Hosting.EfCore" Version="9.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
     </ItemGroup>
 
     <ItemGroup>
