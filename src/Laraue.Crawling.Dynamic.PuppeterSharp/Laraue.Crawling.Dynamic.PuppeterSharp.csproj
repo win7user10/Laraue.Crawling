@@ -1,18 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
     <Description>Crawler based on the PuppeterSharp library.</Description>
-    <RepositoryType>git</RepositoryType>
-    <Authors>Belyanskiy Ilya</Authors>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PuppeteerSharp" Version="20.2.2" />
+    <PackageReference Include="PuppeteerSharp" Version="$(PuppeterSharpVersion)" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Text;
 
 namespace Laraue.Crawling.Common.Impl;
 
@@ -6,14 +6,14 @@ public class VisitorContext
 {
     public VisitorContext()
     {
-        CurrentPath = Array.Empty<Segment>();
+        CurrentPath = [];
     }
 
     public VisitorContext Push(int index)
     {
         return new VisitorContext
         {
-            CurrentPath = CurrentPath.Concat(new[] {new ArraySegment(index)}).ToArray()
+            CurrentPath = CurrentPath.Concat([new ArraySegment(index)]).ToArray()
         };
     }
     
@@ -21,7 +21,7 @@ public class VisitorContext
     {
         return new VisitorContext
         {
-            CurrentPath = CurrentPath.Concat(new[] {new StringSegment(segment)}).ToArray()
+            CurrentPath = CurrentPath.Concat([new StringSegment(segment)]).ToArray()
         };
     }
 
@@ -29,7 +29,7 @@ public class VisitorContext
 
     public override string ToString()
     {
-        var sb = new DefaultInterpolatedStringHandler();
+        var sb = new StringBuilder();
 
         for (var i = 0; i < CurrentPath.Length; i++)
         {
@@ -37,24 +37,24 @@ public class VisitorContext
             switch (segment)
             {
                 case ArraySegment arraySegment:
-                    sb.AppendFormatted('[');
-                    sb.AppendFormatted(arraySegment.Index);
-                    sb.AppendFormatted(']');
+                    sb.Append('[');
+                    sb.Append(arraySegment.Index);
+                    sb.Append(']');
                     break;
                 case StringSegment stringSegment:
                 {
                     if (i != 0)
                     {
-                        sb.AppendFormatted('.');
+                        sb.Append('.');
                     }
                     
-                    sb.AppendFormatted(stringSegment.Value);
+                    sb.Append(stringSegment.Value);
                     break;
                 }
             }
         }
 
-        return sb.ToStringAndClear();
+        return sb.ToString();
     }
 }
 

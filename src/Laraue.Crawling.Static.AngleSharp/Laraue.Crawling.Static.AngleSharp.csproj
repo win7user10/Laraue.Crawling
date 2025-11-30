@@ -1,18 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
     <Description>Crawler based on the AngleSharp library.</Description>
-    <RepositoryType>git</RepositoryType>
-    <Authors>Belyanskiy Ilya</Authors>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="1.3.0" />
+    <PackageReference Include="AngleSharp" Version="$(AngleSharpVersion)" />
   </ItemGroup>
 
   <ItemGroup>

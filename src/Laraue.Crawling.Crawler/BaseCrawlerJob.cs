@@ -32,7 +32,7 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : BaseJob<TState>
     /// <param name="jobState"></param>
     /// <param name="stoppingToken"></param>
     /// <returns></returns>
-    public override async Task<TimeSpan> ExecuteAsync(JobState<TState> jobState, CancellationToken stoppingToken)
+    public override async Task<TimeSpan> ExecuteAsync(JobState<TState> jobState, CancellationToken stoppingToken = default)
     {
         await OnSessionStartAsync(jobState, stoppingToken).ConfigureAwait(false);
         
@@ -40,6 +40,7 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : BaseJob<TState>
 
         while (true)
         {
+            stoppingToken.ThrowIfCancellationRequested();
             pageStopwatch.Restart();
 
             try
@@ -47,15 +48,18 @@ public abstract class BaseCrawlerJob<TModel, TLink, TState> : BaseJob<TState>
                 var link = await GetNextLinkAsync(jobState, stoppingToken).ConfigureAwait(false);
                 _logger.LogInformation("Page {Page} processing started", link);
 
+                stoppingToken.ThrowIfCancellationRequested();
+                
                 var result = await ParseLinkAsync(link, jobState, stoppingToken).ConfigureAwait(false);
+                
+                stoppingToken.ThrowIfCancellationRequested();
+                
                 await AfterLinkParsedAsync(link, result, jobState, stoppingToken).ConfigureAwait(false);
 
                 _logger.LogInformation(
                     "Page {Page} processing finished for {Time}",
                     link,
                     pageStopwatch.Elapsed);
-
-                stoppingToken.ThrowIfCancellationRequested();
             }
             catch (SessionInterruptedException e)
             {

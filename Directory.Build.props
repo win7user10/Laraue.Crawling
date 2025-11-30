@@ -1,0 +1,24 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>Latest</LangVersion>
+    <Copyright>Ilya Belyanskiy 2025</Copyright>
+    <Authors>Belyanskiy Ilya</Authors>
+    <PackageProjectUrl>https://github.com/win7user10/Laraue.Crawling</PackageProjectUrl>
+    <!-- Designate all projects as non-package projects by default -->
+    <IsPackable>false</IsPackable>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <MicrosoftPackagesVersion>[10.0.0, 11)</MicrosoftPackagesVersion>
+    <LaraueCoreExtensionsHostingVersion>[10.0.0, 11]</LaraueCoreExtensionsHostingVersion>
+    <AngleSharpVersion>[1.0.0, 2)</AngleSharpVersion>
+    <PuppeterSharpVersion>[20.0.0, 21)</PuppeterSharpVersion>
+  </PropertyGroup>
+</Project>

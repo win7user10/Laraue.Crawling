@@ -1,19 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  
+  <PropertyGroup>
     <Description>The set of classes to write a program for a data crawling.</Description>
-    <RepositoryType>git</RepositoryType>
-    <Authors>Belyanskiy Ilya</Authors>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Laraue.Core.Extensions.Hosting" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8" />
+    <PackageReference Include="Laraue.Core.Extensions.Hosting" Version="$(LaraueCoreExtensionsHostingVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftPackagesVersion)" />
   </ItemGroup>
 
   <ItemGroup>
