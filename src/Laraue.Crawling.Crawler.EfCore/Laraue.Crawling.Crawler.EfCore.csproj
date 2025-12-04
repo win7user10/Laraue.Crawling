@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Laraue.Core.Extensions.Hosting.EfCore" Version="$(LaraueCoreExtensionsHostingEfCoreVersion)" />
+        <PackageReference Include="Laraue.Core.Extensions.Hosting.EfCore" Version="$(LaraueCoreExtensionsHostingVersion)" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftPackagesVersion)" />
     </ItemGroup>
 
