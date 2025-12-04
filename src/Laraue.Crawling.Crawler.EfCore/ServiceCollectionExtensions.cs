@@ -24,6 +24,6 @@ public static class ServiceCollectionExtensions
         where TModel : class
         where TState : class, new()
     {
-        return services.AddCrawlingService<TCrawlerJob, TModel, TLink, TState, DbJobRunner<TCrawlerJob, TState>>(jobKey, jobConstructorArguments);
+        return services.AddBackgroundJob<TCrawlerJob, TState>(jobKey, jobConstructorArguments);
     }
 }
